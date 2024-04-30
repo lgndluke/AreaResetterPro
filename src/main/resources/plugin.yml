@@ -1,0 +1,67 @@
+name: AreaResetterPro
+version: '${project.version}'
+main: com.lgndluke.arearesetterpro.AreaResetterPro
+api-version: '1.20'
+prefix: AreaResetterPro
+author: lgndluke
+description: A Plugin that lets you create, manage and reset areas of your world.
+depend: [FastAsyncWorldEdit]
+softdepend: [PlaceholderAPI]
+commands:
+  arp_help:
+    description: This command displays a small help menu inside the chat.
+    usage: "/arp_help"
+    permission: arearesetterpro.help
+  arp_reload:
+    description: This command reloads the plugins config files.
+    usage: "/arp_reload"
+    permission: arearesetterpro.reload
+  arp_tool:
+    description: This command will provide the user with the PosTool.
+    usage: "/arp_tool"
+    permission: arearesetterpro.tool
+  arp_getpos:
+    description: This command will send the player the current areas corner positions if they are set.
+    usage: "/arp_getpos"
+    permission: arearesetterpro.getpos
+  arp_create:
+    description: This command is used to create an area.
+    usage: "/arp_create [areaName]"
+    permission: arearesetterpro.create
+  arp_remove:
+    description: This command will remove an area.
+    usage: "/arp_remove [areaName]"
+    permission: arearesetterpro.remove
+  arp_reset:
+    description: This command will reset an area.
+    usage: "/arp_reset [areaName]"
+    permission: arearesetterpro.reset
+  arp_menu:
+    description: This command will open the plugins menu.
+    usage: "/arp_menu"
+    permission: arearesetterpro.gui
+permissions:
+  arearesetterpro.help:
+    description: Allows players to use the help command.
+    default: op
+  arearesetterpro.reload:
+    description: Allows players to reload the plugin.
+    default: op
+  arearesetterpro.tool:
+    description: Allows players to obtain and use the PosTool.
+    default: op
+  arearesetterpro.getpos:
+    description: Allows players to receive the currently set corners.
+    default: op
+  arearesetterpro.create:
+    description: Allows players to create a new area object.
+    default: op
+  arearesetterpro.remove:
+    description: Allows players to remove an area object.
+    default: op
+  arearesetterpro.reset:
+    description: Allows players to reset an area.
+    default: op
+  arearesetterpro.menu:
+    description: Allows players to use the plugins gui.
+    default: op

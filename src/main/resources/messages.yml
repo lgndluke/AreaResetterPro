@@ -1,0 +1,281 @@
+#--------------------------------------------------------------------------------------------
+#AreaResetterPro information
+Version: '${project.version}'
+Author: 'lgndluke'
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+# Make sure every message is inside '' symbols!
+# You can find a list of supported colors here:
+# https://docs.advntr.dev/minimessage/format.html#color
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+#This section contains the plugins most important messages.
+
+#Used in front of nearly messages sent by the Plugin.
+Prefix: '<white>[</white><blue>Area</blue><gold>Resetter</gold><red>Pro</red><white>] | </white>'
+#Used whenever a player tries to execute a command without permission.
+NoPermission: '<red>You are not allowed to use this command!</red>'
+#Used whenever the console tries to execute a player only command.
+#Console does not support color-codes, so try to avoid them if possible.
+ExecutedByConsole: 'This command can not be executed via console!'
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+#This section contains messages the sender will receive upon reloading the plugins configuration files.
+
+#Used whenever the plugins config files are reloaded successfully.
+ReloadConfigsMessage: '<green>Plugin configurations have successfully been reloaded!</green>'
+#Used whenever the reloading processes of the plugins config files fails.
+ReloadConfigsFailedMessage: '<red>Reloading configuration files failed!</red>'
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+#This section contains messages the sender will receive upon using Position commands.
+
+#Command 'arp_setPos1' ⇛ Also used on left-clicks with the SetPosTool.
+SetPos1Message: '<green>Successfully set position 1</green>'
+#Command 'arp_setPos2' ⇒ Also used on right-clicks with the SetPosTool.
+SetPos2Message: '<green>Successfully set position 2</green>'
+#Used when saving process of a position fails.
+SetPosFailed: '<red>Could not save current Position. Check console for more information.</red>'
+
+#Command 'arp_getPos'
+Pos1NotSet: '<red>Position 1 has not been set!</red>'
+Pos2NotSet: '<red>Position 2 has not been set!</red>'
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+#This section contains messages that occur during area creation.
+
+#Used when trying to save an area with a name that is already allocated to another area.
+AreaAlreadyExists: '<red>An area object with this exact name already exists. Please use another name!'
+#Used when creation process is starting.
+AreaCreationStartedMessage: '<blue>Starting Area creation ... this process may take some time!</blue>'
+#Used when the database entry was generated.
+SuccessfulDatabaseEntry: '<green>Successfully transferred Area data to database.</green>'
+#Used when the block data has been saved.
+SuccessfullySavedArea: '<green>Successfully saved Area block data.</green>'
+#Used when the generation process has fully finished.
+CreationSucceededMessage: '<green>Area creation was successful<green>'
+#Used when the generation process failed.
+CreationFailedMessage: '<red>Failed to create area</red>'
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+#This section contains messages that occur during area removal.
+
+#Used when an area has successfully been removed.
+RemoveSucceededMessage: '<green>Successfully removed area.</green>'
+#Used when an area removal process failed.
+RemoveFailedMessage: '<red>Something went wrong whilst trying to remove the specified area. Check your console for more information.</red>'
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+#This section contains messages that occur during area resets.
+
+#Used when an area object has successfully been reset.
+AreaResetSuccessful: '<green>Area reset was successful!</green>'
+#Used when an area object that doesn't exist should be reset.
+#⇒ Message can be ignored when using the GUI for resetting, hence it only shows valid area objects.
+AreaNonExistent: '<red>This area does not exist.</red>'
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+#This section contains messages used in the Plugins GUI.
+
+#The Name of an Area item is specified via how you save it.
+#Therefore, you can only change its lore data here.
+#Lore of an Area item.
+AreaItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<green>Left-Click to open Area settings</green>'
+  - '<red>Right-Click to delete Area</red>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which leads to the next page.
+NextPageItemName: '<gold>Next page</gold>'
+#Lore of the item, which leads to the next page.
+NextPageItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to get to the next page.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which leads to the previous page.
+PreviousPageItemName: '<red>Previous page</red>'
+#Lore of the item, which leads to the previous page.
+PreviousPageItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to get to the previous page.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to reset all current area objects.
+ResetItemName: '<blue>Reset all</blue>'
+#Lore of the item, which is used to reset all current area objects.
+ResetItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to reset all areas.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to fill up empty GUI slots.
+EmptyItemName: '<grey>Empty slot</grey>'
+#Lore of the item, which is used to fill up empty GUI slots.
+EmptyItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<grey>There is no area stored here.</grey>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to confirm Area removals.
+ConfirmationItemName: '<green>Confirm</green>'
+#Lore of the item, which is used to confirm Area removals.
+ConfirmationItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to remove the selected Area.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to cancel an Areas removal.
+CancelItemName: '<red>Cancel</red>'
+#Lore of the item, which is used to cancel an Areas removal.
+CancelItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to cancel.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to instantly reset Area objects.
+InstantResetItemName: '<green>Instant Reset</green>'
+#Lore of the item, which is used to instantly reset Area objects.
+InstantResetItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to instantly reset this Area.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to edit an Area objects reset interval timings.
+TimerItemName: '<gold>Timer</gold>'
+#Lore of the item, which is used to edit an Area objects reset interval timings.
+TimerItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Current auto-reset time:</gold>'
+  - '<gold>Left-Click to change the auto-reset time.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to teleport a player to an Area object.
+TeleportItemName: '<gold>Teleport to Area</gold>'
+#Lore of the item, which is used to teleport a player to an Area object.
+TeleportItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to teleport to this Area.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to display an Areas stats.
+StatsItemName: '<gold>Statistics</gold>'
+#Lore of the item, which is used to display an Areas stats.
+StatsItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Reset:</gold>'
+  - '<gold>Blocks:</gold>'
+  - '<gold>Created:</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to close an Areas settings menu.
+BackItemName: '<red>Back</red>'
+#Lore of the item, which is used to close an Areas settings menu.
+BackItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to close this menu.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to increase an Areas timer value by a small amount.
+SmallIncreaseItemName: '<gold>Small Increase</gold>'
+#Lore of the item, which is used to increase an Areas timer value by a small amount.
+SmallIncreaseItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to increase this Areas reset timer by 30 seconds.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to increase an Areas timer value by a medium amount.
+MediumIncreaseItemName: '<gold>Medium Increase</gold>'
+#Lore of the item, which is used to increase an Areas timer value by a medium amount.
+MediumIncreaseItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to increase the Areas reset timer by 5 minutes.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to increase an Areas timer value by a large amount.
+LargeIncreaseItemName: '<gold>Large Increase</gold>'
+#Lore of the item, which is used to increase an Areas timer value by a large amount.
+LargeIncreaseItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to increase the Areas reset timer by 10 minutes.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to display the Areas current timer value.
+DisplayTimerItemName: '<gold>Current Timer Value</gold>'
+#Lore of the item, which is used to display the Areas current timer value.
+DisplayTimerItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Timer:</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to decrease an Areas timer value by a small amount.
+SmallDecreaseItemName: '<gold>Small Decrease</gold>'
+#Lore of the item, which is used to decrease an Areas timer value by a small amount.
+SmallDecreaseItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to decrease this Areas reset timer by 30 seconds.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to decrease an Areas timer value by a medium amount.
+MediumDecreaseItemName: '<gold>Medium Decrease</gold>'
+#Lore of the item, which is used to decrease an Areas timer value by a medium amount.
+MediumDecreaseItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to decrease this Areas reset timer by 5 minutes.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Name of the item, which is used to decrease an Areas timer value by a large amount.
+LargeDecreaseItemName: '<gold>Large Decrease</gold>'
+#Lore of the item, which is used to decrease an Areas timer value by a large amount.
+LargeDecreaseItemLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to decrease this Areas reset timer by 10 minutes.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
+#Message used when the PreviousPageItem is clicked, but there is no previous page.
+NoNextPage: '<red>There is no next page!</red>'
+#Message used when the NextPageItem is clicked, but there is no further page.
+NoPreviousPage: '<red>There is no previous page!</red>'
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+#This section contains messages used whenever the Plugins help command is executed.
+
+#The help message displayed when the '/arp_help' is executed.
+HelpCreate: '/arp_create [Area] | Create an Area.'
+HelpGetPos: '/arp_getpos | Get saved positions.'
+HelpMenu:   '/arp_menu | Open the GUI.'
+HelpReload: '/arp_reload | Reload the config files.'
+HelpRemove: '/arp_remove [Area] | Remove an Area.'
+HelpReset:  '/arp_reset [Area] | Reset an Area.'
+HelpTool:   '/arp_tool | Obtain the PosTool.'
+
+#--------------------------------------------------------------------------------------------
