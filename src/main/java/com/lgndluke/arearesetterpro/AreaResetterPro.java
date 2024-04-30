@@ -31,7 +31,7 @@ public final class AreaResetterPro extends JavaPlugin {
         DatabaseHandler.initialize();
 
         CommandLoader.load(this);
-        ListenerLoader.load(this);
+        ListenerLoader.load();
 
     }
 
