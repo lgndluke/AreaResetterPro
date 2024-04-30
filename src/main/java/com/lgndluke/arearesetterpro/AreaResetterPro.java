@@ -1,5 +1,8 @@
 package com.lgndluke.arearesetterpro;
 
+import com.lgndluke.arearesetterpro.data.*;
+import com.lgndluke.arearesetterpro.loaders.CommandLoader;
+import com.lgndluke.arearesetterpro.loaders.ListenerLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -22,7 +25,7 @@ public final class AreaResetterPro extends JavaPlugin {
 
         MetricsHandler.connect(this);
 
-        PositionHandler.initialize();
+        PositionsHandler.initialize();
         MessageHandler.initialize();
         ConfigHandler.initialize();
         DatabaseHandler.initialize();
