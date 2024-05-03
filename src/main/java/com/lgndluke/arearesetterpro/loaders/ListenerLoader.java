@@ -30,6 +30,7 @@ public class ListenerLoader {
         areaPlugin.getServer().getPluginManager().registerEvents(settingsListener, areaPlugin);
         areaPlugin.getServer().getPluginManager().registerEvents(timerListener, areaPlugin);
         areaPlugin.getServer().getPluginManager().registerEvents(toolListener, areaPlugin);
+
     }
 
     public static Menu.AreaInvListener getAreaInvListener() {

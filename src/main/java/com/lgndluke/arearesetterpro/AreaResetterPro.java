@@ -3,6 +3,8 @@ package com.lgndluke.arearesetterpro;
 import com.lgndluke.arearesetterpro.data.*;
 import com.lgndluke.arearesetterpro.loaders.CommandLoader;
 import com.lgndluke.arearesetterpro.loaders.ListenerLoader;
+import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -11,27 +13,24 @@ import org.bukkit.plugin.java.JavaPlugin;
 **/
 public final class AreaResetterPro extends JavaPlugin {
 
+    //TODO Before Releasing AreaResetterPro Version 1.4
+    // -> Add Reset Trigger Events inside the Menu.
+
     @Override
     public void onEnable() {
 
-        //TODO Before Releasing AreaResetterPro Version 1.3
-        // -> Rework Database Supervisor to prohibit SQL Injection attacks.
-        // -> Integrate PlaceholderAPI support.
-        // -> Add Error codes.
-        // -> Rework Area creation process.
-        // -> Add spawnpoints to areas -> each area must have a spawnpoint. (location where all players inside the area get teleported to on area reset!)
-
         UpdateHandler.check();
-
         MetricsHandler.connect(this);
-
         PositionsHandler.initialize();
+        SpawnPointHandler.initialize();
         MessageHandler.initialize();
         ConfigHandler.initialize();
         DatabaseHandler.initialize();
-
         CommandLoader.load(this);
         ListenerLoader.load();
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new AreaResetterProExpansion().register();
+        }
 
     }
 

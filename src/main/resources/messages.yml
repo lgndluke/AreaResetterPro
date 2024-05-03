@@ -32,11 +32,11 @@ ReloadConfigsFailedMessage: '<red>Reloading configuration files failed!</red>'
 #--------------------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------------------
-#This section contains messages the sender will receive upon using Position commands.
+#This section contains messages the sender will receive upon using the position command.
 
-#Command 'arp_setPos1' ⇛ Also used on left-clicks with the SetPosTool.
+#Set position 1 ⇛ Used on left-clicks with the SetPosTool.
 SetPos1Message: '<green>Successfully set position 1</green>'
-#Command 'arp_setPos2' ⇒ Also used on right-clicks with the SetPosTool.
+#Set position 2 ⇒ Used on right-clicks with the SetPosTool.
 SetPos2Message: '<green>Successfully set position 2</green>'
 #Used when saving process of a position fails.
 SetPosFailed: '<red>Could not save current Position. Check console for more information.</red>'
@@ -44,6 +44,18 @@ SetPosFailed: '<red>Could not save current Position. Check console for more info
 #Command 'arp_getPos'
 Pos1NotSet: '<red>Position 1 has not been set!</red>'
 Pos2NotSet: '<red>Position 2 has not been set!</red>'
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+#This section contains messages the sender will receive upon using the spawnpoint command.
+
+#Set spawnpoint ⇛ Used on middle-clicks with the SetPosTool.
+SetSpawnPointMessage: '<green>Successfully set spawnpoint</green>'
+#Used when saving process of a position fails.
+SetSpawnPointFailed: '<red>Could not save current spawnpoint. Check console for more information.</red>'
+
+#Command 'arp_getSpawnPoint'
+SpawnPointNotSet: '<red>Spawnpoint has not been set!</red>'
 #--------------------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------------------
@@ -80,6 +92,8 @@ AreaResetSuccessful: '<green>Area reset was successful!</green>'
 #Used when an area object that doesn't exist should be reset.
 #⇒ Message can be ignored when using the GUI for resetting, hence it only shows valid area objects.
 AreaNonExistent: '<red>This area does not exist.</red>'
+#Used when a player inside an area gets teleported to spawn.
+ResetMessagePlayer: '<green>The area you were in has reset.</green>'
 #--------------------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------------------
@@ -272,6 +286,8 @@ NoPreviousPage: '<red>There is no previous page!</red>'
 #The help message displayed when the '/arp_help' is executed.
 HelpCreate: '/arp_create [Area] | Create an Area.'
 HelpGetPos: '/arp_getpos | Get saved positions.'
+HelpGetSpawn: '/arp_getspawnposition | Get saved spawn.'
+HelpSetSpawn: '/arp_setspawnposition | Set spawn.'
 HelpMenu:   '/arp_menu | Open the GUI.'
 HelpReload: '/arp_reload | Reload the config files.'
 HelpRemove: '/arp_remove [Area] | Remove an Area.'

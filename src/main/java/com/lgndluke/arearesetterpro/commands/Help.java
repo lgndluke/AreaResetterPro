@@ -28,6 +28,8 @@ public class Help implements CommandExecutor {
                 sender.sendMessage(this.prefix.append(PlainTextComponentSerializer.plainText().deserialize("-----------------------------------")));
                 sender.sendMessage(this.prefix.append(MessageHandler.getMessageAsComponent("HelpCreate")));
                 sender.sendMessage(this.prefix.append(MessageHandler.getMessageAsComponent("HelpGetPos")));
+                sender.sendMessage(this.prefix.append(MessageHandler.getMessageAsComponent("HelpGetSpawn")));
+                sender.sendMessage(this.prefix.append(MessageHandler.getMessageAsComponent("HelpSetSpawn")));
                 sender.sendMessage(this.prefix.append(MessageHandler.getMessageAsComponent("HelpMenu")));
                 sender.sendMessage(this.prefix.append(MessageHandler.getMessageAsComponent("HelpReload")));
                 sender.sendMessage(this.prefix.append(MessageHandler.getMessageAsComponent("HelpRemove")));
@@ -41,6 +43,8 @@ public class Help implements CommandExecutor {
             areaPlugin.getLogger().log(Level.INFO, "-----------------------------------");
             areaPlugin.getLogger().log(Level.INFO, MessageHandler.getMessageAsString("HelpCreate"));
             areaPlugin.getLogger().log(Level.INFO, MessageHandler.getMessageAsString("HelpGetPos"));
+            areaPlugin.getLogger().log(Level.INFO, MessageHandler.getMessageAsString("HelpGetSpawn"));
+            areaPlugin.getLogger().log(Level.INFO, MessageHandler.getMessageAsString("HelpSetSpawn"));
             areaPlugin.getLogger().log(Level.INFO, MessageHandler.getMessageAsString("HelpMenu"));
             areaPlugin.getLogger().log(Level.INFO, MessageHandler.getMessageAsString("HelpReload"));
             areaPlugin.getLogger().log(Level.INFO, MessageHandler.getMessageAsString("HelpRemove"));

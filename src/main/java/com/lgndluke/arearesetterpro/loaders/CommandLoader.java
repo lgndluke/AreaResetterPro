@@ -20,6 +20,8 @@ public class CommandLoader {
         javaPlugin.getCommand("arp_reload").setExecutor(new Reload());
         javaPlugin.getCommand("arp_tool").setExecutor(new Tool());
         javaPlugin.getCommand("arp_getpos").setExecutor(new GetPos());
+        javaPlugin.getCommand("arp_setspawnpoint").setExecutor(new SetSpawnPoint());
+        javaPlugin.getCommand("arp_getspawnpoint").setExecutor(new GetSpawnPoint());
         javaPlugin.getCommand("arp_create").setExecutor(new Create());
         javaPlugin.getCommand("arp_remove").setExecutor(new Remove());
         javaPlugin.getCommand("arp_reset").setExecutor(new Reset());

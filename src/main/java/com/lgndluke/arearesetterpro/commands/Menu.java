@@ -24,6 +24,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -106,13 +108,19 @@ public class Menu implements CommandExecutor {
             //-----------------------------------------------------------------------------------------------------
             //Database-Operations.
 
-            //Declare SQL-Statements
-            String sqlCount = "SELECT COUNT(uuid) FROM AreaData;";
-            String sqlNames = "SELECT areaName FROM AreaData;";
+            int count = 0;
+            ArrayList<String> names = new ArrayList<>();
 
-            //Get results via DatabaseHandler.executeQuery();
-            int count = Integer.parseInt(DatabaseHandler.executeQuery(sqlCount).get(0));
-            List<String> names = DatabaseHandler.executeQuery(sqlNames);
+            try {
+                ResultSet results = DatabaseHandler.getAreaData();
+                while(results.next()) {
+                    count++;
+                    names.add(results.getString("areaName"));
+                }
+                results.close();
+            } catch (SQLException se) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+            }
 
             //-----------------------------------------------------------------------------------------------------
             //Contents-Operations.
@@ -524,14 +532,23 @@ public class Menu implements CommandExecutor {
             //Change the object name.
             timerItemMeta.displayName(MessageHandler.getMessageAsComponent("TimerItemName"));
 
-            //SQL Statements to get necessary information.
-            String sqlAreaUUID = "SELECT uuid FROM AreaData WHERE areaName = '" + areaName + "';";
-            UUID uuid = UUID.fromString(DatabaseHandler.executeQuery(sqlAreaUUID).get(0));
-            String sqlTimerValue = "SELECT timerValue FROM AreaTimer WHERE uuid = '" + uuid + "';";
+            //Get necessary database information.
+            String sqlAreaUUID = "";
+            int sqlTimerValue = 0;
+            try {
+                ResultSet areaData = DatabaseHandler.getAreaData(areaName);
+                ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                sqlAreaUUID = areaData.getString("uuid");
+                sqlTimerValue = areaTimer.getInt("timerValue");
+                areaData.close();
+                areaTimer.close();
+            } catch (SQLException se) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+            }
 
             //Change the object lore.
             List<Component> timerItemLoreList = MessageHandler.getMessagesAsComponentList("TimerItemLore");
-            int timerVal = Integer.parseInt(DatabaseHandler.executeQuery(sqlTimerValue).get(0));
+            int timerVal = sqlTimerValue;
             int hours = timerVal / 3600;
             int minutes = (timerVal % 3600) / 60;
             int seconds = timerVal % 60;
@@ -570,15 +587,24 @@ public class Menu implements CommandExecutor {
             statsItemMeta.displayName(MessageHandler.getMessageAsComponent("StatsItemName"));
 
             //SQL Statements to get necessary information.
-            String sqlTimesReset = "SELECT timesReset FROM AreaStats WHERE uuid = '" + uuid + "';";
-            String sqlOverallBlocks = "SELECT overallBlocks FROM AreaStats WHERE uuid = '" + uuid + "';";
-            String sqlCreatedOn = "SELECT createdOn FROM AreaStats WHERE uuid = '" + uuid + "';";
+            String sqlTimesReset = "";
+            String sqlOverallBlocks = "";
+            String sqlCreatedOn = "";
+            try {
+                ResultSet areaStats = DatabaseHandler.getAreaStats(UUID.fromString(sqlAreaUUID));
+                sqlTimesReset = String.valueOf(areaStats.getInt("timesReset"));
+                sqlOverallBlocks = String.valueOf(areaStats.getLong("overallBlocks"));
+                sqlCreatedOn = String.valueOf(areaStats.getObject("createdOn"));
+                areaStats.close();
+            } catch (SQLException se) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaStats!", se);
+            }
 
             //Change the object lore.
             List<Component> statsItemLoreList = MessageHandler.getMessagesAsComponentList("StatsItemLore");
-            statsItemLoreList.set(2, statsItemLoreList.get(2).appendSpace().append(Component.text(DatabaseHandler.executeQuery(sqlTimesReset).get(0))));
-            statsItemLoreList.set(3, statsItemLoreList.get(3).appendSpace().append(Component.text(DatabaseHandler.executeQuery(sqlOverallBlocks).get(0))));
-            statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(DatabaseHandler.executeQuery(sqlCreatedOn).get(0))));
+            statsItemLoreList.set(2, statsItemLoreList.get(2).appendSpace().append(Component.text(sqlTimesReset)));
+            statsItemLoreList.set(3, statsItemLoreList.get(3).appendSpace().append(Component.text(sqlOverallBlocks)));
+            statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(sqlCreatedOn)));
             statsItemMeta.lore(statsItemLoreList);
 
             //Assemble metadata back to item.
@@ -637,17 +663,26 @@ public class Menu implements CommandExecutor {
             ItemMeta statsItemMeta = statsItem.getItemMeta();
 
             //SQL Statements to get necessary information.
-            String sqlAreaUUID = "SELECT uuid FROM AreaData WHERE areaName = '" + areaName + "';";
-            UUID uuid = UUID.fromString(DatabaseHandler.executeQuery(sqlAreaUUID).get(0));
-            String sqlTimesReset = "SELECT timesReset FROM AreaStats WHERE uuid = '" + uuid + "';";
-            String sqlOverallBlocks = "SELECT overallBlocks FROM AreaStats WHERE uuid = '" + uuid + "';";
-            String sqlCreatedOn = "SELECT createdOn FROM AreaStats WHERE uuid = '" + uuid + "';";
+            String sqlTimesReset = "";
+            String sqlOverallBlocks = "";
+            String sqlCreatedOn = "";
+            try {
+                ResultSet areaData = DatabaseHandler.getAreaData(areaName);
+                ResultSet areaStats = DatabaseHandler.getAreaStats(UUID.fromString(areaData.getString("uuid")));
+                sqlTimesReset = String.valueOf(areaStats.getInt("timesReset"));
+                sqlOverallBlocks = String.valueOf(areaStats.getLong("overallBlocks"));
+                sqlCreatedOn = String.valueOf(areaStats.getObject("createdOn"));
+                areaData.close();
+                areaStats.close();
+            } catch (SQLException se) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaStats!", se);
+            }
 
             //Change the object lore.
             List<Component> statsItemLoreList = MessageHandler.getMessagesAsComponentList("StatsItemLore");
-            statsItemLoreList.set(2, statsItemLoreList.get(2).appendSpace().append(Component.text(DatabaseHandler.executeQuery(sqlTimesReset).get(0))));
-            statsItemLoreList.set(3, statsItemLoreList.get(3).appendSpace().append(Component.text(DatabaseHandler.executeQuery(sqlOverallBlocks).get(0))));
-            statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(DatabaseHandler.executeQuery(sqlCreatedOn).get(0))));
+            statsItemLoreList.set(2, statsItemLoreList.get(2).appendSpace().append(Component.text(sqlTimesReset)));
+            statsItemLoreList.set(3, statsItemLoreList.get(3).appendSpace().append(Component.text(sqlOverallBlocks)));
+            statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(sqlCreatedOn)));
             statsItemMeta.lore(statsItemLoreList);
 
             //Assemble metadata back to item.
@@ -699,16 +734,18 @@ public class Menu implements CommandExecutor {
                     if(settingsMenu.getTeleportItem().equals(event.getCurrentItem())) {
                         //Teleport player to saved coordinates and close inventory.
                         //-----------------------------------------------------------
-                        String sql_world = "SELECT world FROM AreaData WHERE areaName = '" + itemName + "';";
-                        String sql_x = "SELECT x FROM AreaData WHERE areaName = '" + itemName + "';";
-                        String sql_y = "SELECT y FROM AreaData WHERE areaName = '" + itemName + "';";
-                        String sql_z = "SELECT z FROM AreaData WHERE areaName = '" + itemName + "';";
-                        World world = WorldCreator.name(DatabaseHandler.executeQuery(sql_world).get(0)).createWorld();
-                        int xVal = Integer.parseInt(DatabaseHandler.executeQuery(sql_x).get(0));
-                        int yVal = Integer.parseInt(DatabaseHandler.executeQuery(sql_y).get(0));
-                        int zVal = Integer.parseInt(DatabaseHandler.executeQuery(sql_z).get(0));
-                        player.teleportAsync(new Location(world, xVal, yVal, zVal));
-                        event.setCancelled(true);
+                        try {
+                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
+                            World world = WorldCreator.name(areaData.getString("world")).createWorld();
+                            int xVal = areaData.getInt("xValSpawn");
+                            int yVal = areaData.getInt("yValSpawn");
+                            int zVal = areaData.getInt("zValSpawn");
+                            areaData.close();
+                            player.teleportAsync(new Location(world, xVal, yVal, zVal));
+                            event.setCancelled(true);
+                        } catch (SQLException se) {
+                            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                        }
                         //-----------------------------------------------------------
                     }
                     //-----------------------------------------------------------
@@ -821,13 +858,19 @@ public class Menu implements CommandExecutor {
             displayTimerItemMeta.displayName(MessageHandler.getMessageAsComponent("DisplayTimerItemName"));
 
             //SQL Statements to get necessary information.
-            String sqlAreaUUID = "SELECT uuid FROM AreaData WHERE areaName = '" + areaName + "';";
-            UUID uuid = UUID.fromString(DatabaseHandler.executeQuery(sqlAreaUUID).get(0));
-            String sqlTimerValue = "SELECT timerValue FROM AreaTimer WHERE uuid = '" + uuid + "';";
+            int timerVal = 0;
+            try {
+                ResultSet areaData = DatabaseHandler.getAreaData(areaName);
+                ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                timerVal = areaTimer.getInt("timerValue");
+                areaData.close();
+                areaTimer.close();
+            } catch (SQLException se) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+            }
 
             //Change the object lore.
             List<Component> displayTimerItemLoreList = MessageHandler.getMessagesAsComponentList("DisplayTimerItemLore");
-            int timerVal = Integer.parseInt(DatabaseHandler.executeQuery(sqlTimerValue).get(0));
             int hours = timerVal / 3600;
             int minutes = (timerVal % 3600) / 60;
             int seconds = timerVal % 60;
@@ -938,17 +981,24 @@ public class Menu implements CommandExecutor {
             }
             return this.inv;
         }
-        private void updateDisplayItem(UUID areaID) {
+        private void updateDisplayItem(UUID uuid) {
             //-----------------------------------------------------------
             //Create the metadata object.
             ItemMeta displayTimerItemMeta = displayTimerItem.getItemMeta();
 
             //SQL Statements to get necessary information.
-            String sqlTimerValue = "SELECT timerValue FROM AreaTimer WHERE uuid = '" + areaID + "';";
+            int timerVal = 0;
+            try {
+                ResultSet areaTimer = DatabaseHandler.getAreaTimer(uuid);
+                timerVal = areaTimer.getInt("timerValue");
+                areaTimer.close();
+            } catch (SQLException se) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+            }
+
 
             //Change the object lore.
             List<Component> displayTimerItemLoreList = MessageHandler.getMessagesAsComponentList("DisplayTimerItemLore");
-            int timerVal = Integer.parseInt(DatabaseHandler.executeQuery(sqlTimerValue).get(0));
             int hours = timerVal / 3600;
             int minutes = (timerVal % 3600) / 60;
             int seconds = timerVal % 60;
@@ -985,96 +1035,120 @@ public class Menu implements CommandExecutor {
                     //Check, if the clicked item was small increase item.
                     //-----------------------------------------------------------
                     if(timerMenu.getSmallIncreaseItem().equals(event.getCurrentItem())) {
-                        String sqlSelectUUID = "SELECT uuid FROM AreaData WHERE areaName = '" + itemName + "';";
-                        UUID areaID = UUID.fromString(DatabaseHandler.executeQuery(sqlSelectUUID).get(0));
-                        String sqlGetCurrTimerVal = "SELECT timerValue FROM AreaTimer WHERE uuid = '" + areaID + "';";
-                        int currTimerVal = Integer.parseInt(DatabaseHandler.executeQuery(sqlGetCurrTimerVal).get(0));
-                        int smallIncVal = (int) ConfigHandler.get("SmallIncreaseValue");
-                        int updateVal = currTimerVal+smallIncVal;
-                        String sqlInsertChange = "UPDATE AreaTimer SET timerValue = " + updateVal + " WHERE uuid = '" + areaID + "';";
-                        DatabaseHandler.execute(sqlInsertChange);
-                        AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
-                        this.timerMenu.updateDisplayItem(areaID);
+                        try {
+                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            int currTimerVal = areaTimer.getInt("timerValue");
+                            int smallIncVal = (int) ConfigHandler.get("SmallIncreaseValue");
+                            int updateVal = currTimerVal+smallIncVal;
+                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
+                            areaData.close();
+                            areaTimer.close();
+                        } catch (SQLException se) {
+                            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                        }
                     }
                     //-----------------------------------------------------------
 
                     //Check, if the clicked item was medium increase item.
                     //-----------------------------------------------------------
                     if(timerMenu.getMediumIncreaseItem().equals(event.getCurrentItem())) {
-                        String sqlSelectUUID = "SELECT uuid FROM AreaData WHERE areaName = '" + itemName + "';";
-                        UUID areaID = UUID.fromString(DatabaseHandler.executeQuery(sqlSelectUUID).get(0));
-                        String sqlGetCurrTimerVal = "SELECT timerValue FROM AreaTimer WHERE uuid = '" + areaID + "';";
-                        int currTimerVal = Integer.parseInt(DatabaseHandler.executeQuery(sqlGetCurrTimerVal).get(0));
-                        int mediumIncVal = (int) ConfigHandler.get("MediumIncreaseValue");
-                        int updateVal = currTimerVal+mediumIncVal;
-                        String sqlInsertChange = "UPDATE AreaTimer SET timerValue = " + updateVal + " WHERE uuid = '" + areaID + "';";
-                        DatabaseHandler.execute(sqlInsertChange);
-                        AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
-                        this.timerMenu.updateDisplayItem(areaID);
+                        try {
+                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            int currTimerVal = areaTimer.getInt("timerValue");
+                            int mediumIncVal = (int) ConfigHandler.get("MediumIncreaseValue");
+                            int updateVal = currTimerVal+mediumIncVal;
+                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
+                            areaData.close();
+                            areaTimer.close();
+                        } catch (SQLException se) {
+                            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                        }
                     }
                     //-----------------------------------------------------------
 
                     //Check, if the clicked item was large increase item.
                     //-----------------------------------------------------------
                     if(timerMenu.getLargeIncreaseItem().equals(event.getCurrentItem())) {
-                        String sqlSelectUUID = "SELECT uuid FROM AreaData WHERE areaName = '" + itemName + "';";
-                        UUID areaID = UUID.fromString(DatabaseHandler.executeQuery(sqlSelectUUID).get(0));
-                        String sqlGetCurrTimerVal = "SELECT timerValue FROM AreaTimer WHERE uuid = '" + areaID + "';";
-                        int currTimerVal = Integer.parseInt(DatabaseHandler.executeQuery(sqlGetCurrTimerVal).get(0));
-                        int largeIncVal = (int) ConfigHandler.get("LargeIncreaseValue");
-                        int updateVal = currTimerVal+largeIncVal;
-                        String sqlInsertChange = "UPDATE AreaTimer SET timerValue = " + updateVal + " WHERE uuid = '" + areaID + "';";
-                        DatabaseHandler.execute(sqlInsertChange);
-                        AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
-                        this.timerMenu.updateDisplayItem(areaID);
+                        try {
+                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            int currTimerVal = areaTimer.getInt("timerValue");
+                            int largeIncVal = (int) ConfigHandler.get("LargeIncreaseValue");
+                            int updateVal = currTimerVal+largeIncVal;
+                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
+                            areaData.close();
+                            areaTimer.close();
+                        } catch (SQLException se) {
+                            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                        }
                     }
                     //-----------------------------------------------------------
 
                     //Check, if the clicked item was small decrease item.
                     //-----------------------------------------------------------
                     if(timerMenu.getSmallDecreaseItem().equals(event.getCurrentItem())) {
-                        String sqlSelectUUID = "SELECT uuid FROM AreaData WHERE areaName = '" + itemName + "';";
-                        UUID areaID = UUID.fromString(DatabaseHandler.executeQuery(sqlSelectUUID).get(0));
-                        String sqlGetCurrTimerVal = "SELECT timerValue FROM AreaTimer WHERE uuid = '" + areaID + "';";
-                        int currTimerVal = Integer.parseInt(DatabaseHandler.executeQuery(sqlGetCurrTimerVal).get(0));
-                        int smallDecVal = (int) ConfigHandler.get("SmallDecreaseValue");
-                        int updateVal = currTimerVal-smallDecVal;
-                        String sqlInsertChange = "UPDATE AreaTimer SET timerValue = " + updateVal + " WHERE uuid = '" + areaID + "';";
-                        DatabaseHandler.execute(sqlInsertChange);
-                        AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
-                        this.timerMenu.updateDisplayItem(areaID);
+                        try {
+                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            int currTimerVal = areaTimer.getInt("timerValue");
+                            int smallDecVal = (int) ConfigHandler.get("SmallDecreaseValue");
+                            int updateVal = currTimerVal-smallDecVal;
+                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
+                            areaData.close();
+                            areaTimer.close();
+                        } catch (SQLException se) {
+                            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                        }
                     }
                     //-----------------------------------------------------------
 
                     //Check, if the clicked item was medium decrease item.
                     //-----------------------------------------------------------
                     if(timerMenu.getMediumDecreaseItem().equals(event.getCurrentItem())) {
-                        String sqlSelectUUID = "SELECT uuid FROM AreaData WHERE areaName = '" + itemName + "';";
-                        UUID areaID = UUID.fromString(DatabaseHandler.executeQuery(sqlSelectUUID).get(0));
-                        String sqlGetCurrTimerVal = "SELECT timerValue FROM AreaTimer WHERE uuid = '" + areaID + "';";
-                        int currTimerVal = Integer.parseInt(DatabaseHandler.executeQuery(sqlGetCurrTimerVal).get(0));
-                        int mediumDecVal = (int) ConfigHandler.get("MediumDecreaseValue");
-                        int updateVal = currTimerVal-mediumDecVal;
-                        String sqlInsertChange = "UPDATE AreaTimer SET timerValue = " + updateVal + " WHERE uuid = '" + areaID + "';";
-                        DatabaseHandler.execute(sqlInsertChange);
-                        AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
-                        this.timerMenu.updateDisplayItem(areaID);
+                        try {
+                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            int currTimerVal = areaTimer.getInt("timerValue");
+                            int mediumDecVal = (int) ConfigHandler.get("MediumDecreaseValue");
+                            int updateVal = currTimerVal-mediumDecVal;
+                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
+                            areaData.close();
+                            areaTimer.close();
+                        } catch (SQLException se) {
+                            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                        }
                     }
                     //-----------------------------------------------------------
 
                     //Check, if the clicked item was large decrease item.
                     //-----------------------------------------------------------
                     if(timerMenu.getLargeDecreaseItem().equals(event.getCurrentItem())) {
-                        String sqlSelectUUID = "SELECT uuid FROM AreaData WHERE areaName = '" + itemName + "';";
-                        UUID areaID = UUID.fromString(DatabaseHandler.executeQuery(sqlSelectUUID).get(0));
-                        String sqlGetCurrTimerVal = "SELECT timerValue FROM AreaTimer WHERE uuid = '" + areaID + "';";
-                        int currTimerVal = Integer.parseInt(DatabaseHandler.executeQuery(sqlGetCurrTimerVal).get(0));
-                        int largeDecVal = (int) ConfigHandler.get("LargeDecreaseValue");
-                        int updateVal = currTimerVal-largeDecVal;
-                        String sqlInsertChange = "UPDATE AreaTimer SET timerValue = " + updateVal + " WHERE uuid = '" + areaID + "';";
-                        DatabaseHandler.execute(sqlInsertChange);
-                        AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
-                        this.timerMenu.updateDisplayItem(areaID);
+                        try {
+                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            int currTimerVal = areaTimer.getInt("timerValue");
+                            int largeDecVal = (int) ConfigHandler.get("LargeDecreaseValue");
+                            int updateVal = currTimerVal-largeDecVal;
+                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
+                            areaData.close();
+                            areaTimer.close();
+                        } catch (SQLException se) {
+                            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                        }
                     }
                     //-----------------------------------------------------------
 

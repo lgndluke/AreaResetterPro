@@ -15,7 +15,7 @@ EnableAutoResets: true
 
 #Specify the default time between reset for every new created Area object.
 #By default, every Area object is reset once an hour.
-DefaultTimerValue: 3600
+DefaultTimerValue: 600
 
 #Determine, by how much increases or decreases from the GUI should affect the reset timer.
 SmallIncreaseValue: 30

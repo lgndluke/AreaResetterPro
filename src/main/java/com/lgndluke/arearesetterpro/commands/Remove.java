@@ -1,8 +1,10 @@
 package com.lgndluke.arearesetterpro.commands;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
+import com.lgndluke.arearesetterpro.data.AutoResetHandler;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
 import com.lgndluke.arearesetterpro.data.MessageHandler;
+import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,7 +14,8 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -74,35 +77,35 @@ public class Remove implements CommandExecutor {
         @Override
         public void run() {
 
-            //Define SQL-Strings
-            String sql = "SELECT areaName FROM AreaData;";
-            String sqlUuid = "SELECT uuid FROM AreaData WHERE areaName = '" + this.areaName + "';";
-            String sqlRemoveData = "DELETE FROM AreaData WHERE areaName = '" + this.areaName + "';";
+            try {
+                ResultSet results = DatabaseHandler.getAreaData();
+                while(results.next()) {
+                    if (results.getString("areaName").equals(this.areaName)) {
+                        UUID uuid = UUID.fromString(results.getString("uuid"));
+                        DatabaseHandler.deleteAreaData(this.areaName);
+                        DatabaseHandler.deleteAreaStats(uuid);
+                        DatabaseHandler.deleteAreaTimer(uuid);
 
-            List<String> resultNames = DatabaseHandler.executeQuery(sql);
-            if(resultNames.contains(this.areaName)) {
-                //Get UUID for removal of Files.
-                UUID uuid = UUID.fromString(DatabaseHandler.executeQuery(sqlUuid).get(0));
-                //Delete Database-Information of Area-Object.
-                String sqlRemoveStats = "DELETE FROM AreaStats WHERE uuid = '" + uuid + "';";
-                String sqlRemoveTimer = "DELETE FROM AreaTimer WHERE uuid = '" + uuid + "';";
-                DatabaseHandler.execute(sqlRemoveData);
-                DatabaseHandler.execute(sqlRemoveStats);
-                DatabaseHandler.execute(sqlRemoveTimer);
-                //Set file-path and delete .nbt-File.
-                try {
-                    String filePath = "AreaData/" + uuid + ".nbt";
-                    File worldData = new File(areaPlugin.getDataFolder().getAbsolutePath(), filePath);
-                    boolean worldDataDeleted = worldData.delete();
-                    if(worldDataDeleted) {
-                        this.player.sendMessage(prefix.append(this.success));
+                        String filePath = "AreaData/" + uuid + ".schem";
+                        File worldData = new File(areaPlugin.getDataFolder().getAbsolutePath(), filePath);
+                        boolean worldDataDeleted = worldData.delete();
+                        if (worldDataDeleted) {
+                            this.player.sendMessage(prefix.append(this.success));
+                        } else {
+                            this.player.sendMessage(prefix.append(this.failed));
+                        }
+                        return;
                     }
-                } catch (Exception e) {
-                    this.player.sendMessage(prefix.append(this.failed));
-                    areaPlugin.getLogger().log(Level.SEVERE, "A SecurityException occurred whilst trying to remove the '.schem' file!", e);
                 }
-            } else {
+                results.close();
+                AutoResetHandler.removeAreaResetter(this.areaName);
+                AreaResetterProExpansion.updateValues();
                 this.player.sendMessage(prefix.append(this.nonExist));
+            } catch (SecurityException securityException) {
+                this.player.sendMessage(prefix.append(this.failed));
+                areaPlugin.getLogger().log(Level.SEVERE, "A SecurityException occurred whilst trying to remove the '.schem' file!", securityException);
+            } catch (SQLException se) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
             }
 
         }

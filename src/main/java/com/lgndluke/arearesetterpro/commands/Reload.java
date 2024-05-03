@@ -4,6 +4,8 @@ import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.data.ConfigHandler;
 import com.lgndluke.arearesetterpro.data.MessageHandler;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
+import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
+import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -50,6 +52,8 @@ public class Reload implements CommandExecutor {
             ConfigHandler.reload();
             MessageHandler.reload();
             PositionsHandler.reload();
+            SpawnPointHandler.reload();
+            AreaResetterProExpansion.updateValues();
             sender.sendMessage(prefix.append(reloadMsg));
         } catch (IOException io) {
             sender.sendMessage(prefix.append(reloadFailedMsg));
@@ -61,6 +65,8 @@ public class Reload implements CommandExecutor {
             ConfigHandler.reload();
             MessageHandler.reload();
             PositionsHandler.reload();
+            SpawnPointHandler.reload();
+            AreaResetterProExpansion.updateValues();
             areaPlugin.getLogger().log(Level.INFO, MessageHandler.getMessageAsString("ReloadConfigsMessage"));
         } catch (IOException io) {
             areaPlugin.getLogger().log(Level.SEVERE, MessageHandler.getMessageAsString("ReloadConfigsFailedMessage"));

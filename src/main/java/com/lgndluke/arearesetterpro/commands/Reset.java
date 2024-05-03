@@ -4,9 +4,15 @@ import com.fastasyncworldedit.core.FaweAPI;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
 import com.lgndluke.arearesetterpro.data.MessageHandler;
+import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
+import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,7 +21,11 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 /**
@@ -65,6 +75,7 @@ public class Reset implements CommandExecutor {
         //Attributes
         private final Component success = MessageHandler.getMessageAsComponent("AreaResetSuccessful");
         private final Component nonExist = MessageHandler.getMessageAsComponent("AreaNonExistent");
+        private final Component resetMsgPlayer = MessageHandler.getMessageAsComponent("ResetMessagePlayer");
         private final CommandSender sender;
         private final String areaName;
 
@@ -78,54 +89,62 @@ public class Reset implements CommandExecutor {
         public void run() {
             //-----------------------------------------------------------
             //Define SQL-Statements and UUID as String.
-            String sqlAreaCheck = "SELECT areaName FROM AreaData;";
-            String sqlUuid = "SELECT uuid FROM AreaData WHERE areaName = '" + areaName + "';";
-            String sqlWorld = "SELECT world FROM AreaData WHERE areaName = '" + areaName + "';";
+            try {
+                ResultSet results = DatabaseHandler.getAreaData();
+                while(results.next()) {
 
-            List<String> resultNames = DatabaseHandler.executeQuery(sqlAreaCheck);
-            if(resultNames.contains(areaName)) {
+                    if(results.getString("areaName").equals(areaName)) {
+                        UUID uuid = UUID.fromString(results.getString("uuid"));
+                        String worldName = results.getString("world");
 
-                //Get Data from Database.
-                String uuid = DatabaseHandler.executeQuery(sqlUuid).get(0);
-                String worldName = DatabaseHandler.executeQuery(sqlWorld).get(0);
+                        int xVal1 = results.getInt("xValPos1");
+                        int yVal1 = results.getInt("yValPos1");
+                        int zVal1 = results.getInt("zValPos1");
 
-                String sqlCoordX = "SELECT x FROM AreaData WHERE uuid = '" + uuid + "'";
-                String sqlCoordY = "SELECT y FROM AreaData WHERE uuid = '" + uuid + "'";
-                String sqlCoordZ = "SELECT z FROM AreaData WHERE uuid = '" + uuid + "'";
-                String sqlTimesReset = "SELECT timesReset FROM AreaStats WHERE uuid = '" + uuid + "'";
+                        int xVal2 = results.getInt("xValPos2");
+                        int yVal2 = results.getInt("yValPos2");
+                        int zVal2 = results.getInt("zValPos2");
 
-                int xCoord = Integer.parseInt(DatabaseHandler.executeQuery(sqlCoordX).get(0));
-                int yCoord = Integer.parseInt(DatabaseHandler.executeQuery(sqlCoordY).get(0));
-                int zCoord = Integer.parseInt(DatabaseHandler.executeQuery(sqlCoordZ).get(0));
-                int timesReset = Integer.parseInt(DatabaseHandler.executeQuery(sqlTimesReset).get(0));
+                        int xValSpawn = results.getInt("xValSpawn");
+                        int yValSpawn = results.getInt("yValSpawn");
+                        int zValSpawn = results.getInt("zValSpawn");
 
-                //Set file-path and get StructureManager.
-                String filePath = "AreaData/" + uuid + ".schem";
-                File worldData = new File(areaPlugin.getDataFolder().getAbsolutePath(), filePath);
+                        results.close();
 
-                try {
-                    FaweAPI.load(worldData).paste(FaweAPI.getWorld(worldName), BlockVector3.at(xCoord, yCoord, zCoord)).close();
-                    //Update reset statistics.
-                    String sqlUpdateResetCounter = "UPDATE AreaStats SET timesReset = " + Math.addExact(timesReset, 1) + " WHERE uuid = '" + uuid + "';";
-                    DatabaseHandler.execute(sqlUpdateResetCounter);
-                } catch (Exception e) {
-                    areaPlugin.getLogger().log(Level.SEVERE, "Could not reset area: " + areaName);
-                    if(sender instanceof Player) {
-                        sender.sendMessage(prefix.append(Component.text("Couldn't reset area. Check console for more information!")));
+                        ResultSet areaStats = DatabaseHandler.getAreaStats(uuid);
+                        int timesReset = areaStats.getInt("timesReset");
+                        areaStats.close();
+
+                        String filePath = "AreaData/" + uuid + ".schem";
+                        File worldData = new File(areaPlugin.getDataFolder().getAbsolutePath(), filePath);
+
+                        List<Player> activePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
+                        for(Player player : activePlayers) {
+                            if(isInsideArea(player, new Location(WorldCreator.name(worldName).createWorld(), xVal1, yVal1, zVal1),
+                                    new Location(WorldCreator.name(worldName).createWorld(), xVal2, yVal2, zVal2)))
+                            {
+                                player.sendMessage(prefix.append(this.resetMsgPlayer));
+                                player.teleportAsync(new Location(WorldCreator.name(worldName).createWorld(), xValSpawn, yValSpawn, zValSpawn));
+                            }
+                        }
+
+                        FaweAPI.load(worldData).paste(FaweAPI.getWorld(worldName), BlockVector3.at(Math.min(xVal1, xVal2), Math.min(yVal1, yVal2), Math.min(zVal1, zVal2)));
+                        DatabaseHandler.updateAreaStatsTimesReset(uuid, timesReset);
+
+                        if(sender instanceof Player) {
+                            sender.sendMessage(prefix.append(this.success));
+                        } else {
+                            String plainSuccess = PlainTextComponentSerializer.plainText().serialize(success);
+                            areaPlugin.getLogger().log(Level.INFO, plainSuccess);
+                        }
+
+                        return;
+
                     }
-                    areaPlugin.getLogger().log(Level.SEVERE, "An Error occurred whilst trying to reset the area.", e);
-                    return;
+
                 }
 
-                if(sender instanceof Player) {
-                    sender.sendMessage(prefix.append(this.success));
-                } else {
-                    String plainSuccess = PlainTextComponentSerializer.plainText().serialize(success);
-                    areaPlugin.getLogger().log(Level.INFO, plainSuccess);
-                }
-
-            } else {
-
+                results.close();
                 if(sender instanceof Player) {
                     sender.sendMessage(prefix.append(this.nonExist));
                 } else {
@@ -133,8 +152,35 @@ public class Reset implements CommandExecutor {
                     areaPlugin.getLogger().log(Level.INFO, plainNonExist);
                 }
 
+            } catch (SQLException se) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+            } catch (IOException e) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Could not reset area: " + areaName);
+                if(sender instanceof Player) {
+                    sender.sendMessage(prefix.append(Component.text("Couldn't reset area. Check console for more information!")));
+                }
+                areaPlugin.getLogger().log(Level.SEVERE, "An Error occurred whilst trying to reset the area.", e);
             }
             //-----------------------------------------------------------
+        }
+
+        private boolean isInsideArea(Player player, Location pos1, Location pos2) {
+
+            double xValPlayer = player.getLocation().getBlockX();
+            double yValPlayer = player.getLocation().getBlockY();
+            double zValPlayer = player.getLocation().getBlockZ();
+
+            int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
+            int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
+            int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
+            int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
+            int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
+            int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
+
+            return ((xValPlayer >= minX && xValPlayer <= maxX) &&
+                    (yValPlayer >= minY && yValPlayer <= maxY) &&
+                    (zValPlayer >= minZ && zValPlayer <= maxZ));
+
         }
 
     }
@@ -152,10 +198,15 @@ public class Reset implements CommandExecutor {
 
         @Override
         public void run() {
-            String sqlAreaCheck = "SELECT areaName FROM AreaData;";
-            List<String> resultNames = DatabaseHandler.executeQuery(sqlAreaCheck);
-            for (String resultName : resultNames) {
-                areaPlugin.getServer().getScheduler().runTaskAsynchronously(areaPlugin, new ResetArea(sender, resultName));
+            try {
+                ResultSet results = DatabaseHandler.getAreaData();
+                while (results.next()) {
+                    areaPlugin.getServer().getScheduler().runTaskAsynchronously(areaPlugin, new ResetArea(sender, results.getString("areaName")));
+                }
+                results.close();
+                AreaResetterProExpansion.updateValues();
+            } catch (SQLException se) {
+                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
             }
         }
 

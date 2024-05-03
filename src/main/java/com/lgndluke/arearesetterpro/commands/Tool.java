@@ -55,8 +55,7 @@ public class Tool implements CommandExecutor {
     }
 
     /**
-     * Public Inner Top-Level Class SetPosTool
-     * -> Represents the SetPosTool as ItemStack object.
+     * This class represents the SetPosTool as ItemStack object.
      * @author lgndluke
      **/
     private static class SetPosTool {
@@ -94,8 +93,8 @@ public class Tool implements CommandExecutor {
             //Add Meta-Data back to ItemStack.
             setPosTool.setItemMeta(setPosToolMeta);
 
-
         }
+
         private static ItemStack getSetPosTool() {
             if(setPosTool == null) {
                 initializePosTool();
@@ -153,8 +152,7 @@ public class Tool implements CommandExecutor {
     }
 
     /**
-     * Public Inner Top-Level Class SavePosThread
-     * -> This class is used to registered Positions to the "Positions.yml" file.
+     * This class is used to do read/write operations to the "Positions.yml" file.
      * @author lgndluke
      **/
     protected static class SavePosThread implements Runnable {
@@ -178,29 +176,40 @@ public class Tool implements CommandExecutor {
         @Override
         public void run() {
 
-            //This if-Statement is required to reset positions on Area-Creation.
-            if(this.player == null) {
-                PositionsHandler.setPosition(PositionsHandler.Position.POS1, null);
-                PositionsHandler.setPosition(PositionsHandler.Position.POS2, null);
-                return;
-            } else {
-                PositionsHandler.setPosition(this.pos, this.location);
-                PositionsHandler.save();
-
-                if(this.pos == (PositionsHandler.Position.POS1)) {
-                    player.sendMessage(prefix.append(this.setPos1));
-                } else {
-                    player.sendMessage(prefix.append(this.setPos2));
-                }
-            }
-
-            //Reload the 'Positions.yml' file.
             try {
+
+                //This if-Statement is required to reset positions on area creation.
+                if(this.player == null) {
+
+                    PositionsHandler.setPosition(PositionsHandler.Position.POS1, null);
+                    PositionsHandler.setPosition(PositionsHandler.Position.POS2, null);
+                    PositionsHandler.save();
+                    PositionsHandler.reload();
+                    return;
+
+                } else {
+
+                    PositionsHandler.setPosition(this.pos, this.location);
+                    PositionsHandler.save();
+
+                    if(this.pos == (PositionsHandler.Position.POS1)) {
+                        player.sendMessage(prefix.append(this.setPos1));
+                    } else {
+                        player.sendMessage(prefix.append(this.setPos2));
+                    }
+
+                }
+
                 PositionsHandler.reload();
+
             } catch (IOException io) {
-                this.player.sendMessage(prefix.append(this.setPosFailed));
+
+                if(this.player != null) {
+                    this.player.sendMessage(prefix.append(this.setPosFailed));
+                }
                 String plainSetPosFailed = PlainTextComponentSerializer.plainText().serialize(setPosFailed);
                 areaPlugin.getLogger().log(Level.SEVERE, plainSetPosFailed, io);
+
             }
 
         }
