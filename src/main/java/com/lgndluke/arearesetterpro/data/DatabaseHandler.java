@@ -123,10 +123,11 @@ public class DatabaseHandler {
 
     public static void insertAreaStats(UUID uuid, long overallBlocks) {
         try {
-            PreparedStatement prepState = dbCon.prepareStatement("INSERT INTO AreaStats (uuid, timesReset, overallBlocks, createdOn) VALUES (?, 0, ?, ?);");
+            PreparedStatement prepState = dbCon.prepareStatement("INSERT INTO AreaStats (uuid, timesReset, overallBlocks, entitiesSaved, createdOn) VALUES (?, 0, ?, ?, ?);");
             prepState.setString(1, uuid.toString());
             prepState.setLong(2, overallBlocks);
-            prepState.setString(3, new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
+            prepState.setBoolean(3, (boolean) ConfigHandler.get("SaveEntities"));
+            prepState.setString(4, new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
             prepState.execute();
             prepState.close();
         } catch (SQLException se) {
@@ -250,6 +251,7 @@ public class DatabaseHandler {
                 "uuid TEXT NOT NULL, " +
                 "timesReset INT NOT NULL, " +
                 "overallBlocks BIGINT NOT NULL, " +
+                "entitiesSaved BOOLEAN NOT NULL, " +
                 "createdOn TEXT NOT NULL, " +
                 "PRIMARY KEY (uuid), " +
                 "CONSTRAINT fk_AreaStats_AreaData " +

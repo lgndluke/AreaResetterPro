@@ -204,12 +204,12 @@ public class Create implements CommandExecutor {
             //Save structure via FastAsyncWorldEdit.
             Region region = new CuboidRegion(BlockVector3.at(positions[0].getBlockX(), positions[0].getBlockY(), positions[0].getBlockZ()),
                                              BlockVector3.at(positions[1].getBlockX(), positions[1].getBlockY(), positions[1].getBlockZ()));
-
             region.setWorld(FaweAPI.getWorld(positions[0].getWorld().getName()));
+
             Clipboard clip = new BlockArrayClipboard(region);
             EditSession editSession = WorldEdit.getInstance().newEditSession(FaweAPI.getWorld(positions[0].getWorld().getName()));
             ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(editSession, region, clip, region.getMinimumPoint());
-            forwardExtentCopy.setCopyingEntities(false);
+            forwardExtentCopy.setCopyingEntities((boolean) ConfigHandler.get("SaveEntities"));
             Operations.complete(forwardExtentCopy);
             editSession.close();
             clip.save(data, BuiltInClipboardFormat.FAST);

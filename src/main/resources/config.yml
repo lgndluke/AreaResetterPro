@@ -5,6 +5,11 @@ Author: 'lgndluke'
 #--------------------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------------------
+#Decide, whether the Plugin should save Entities on Area creation, or not.
+SaveEntities: true
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
 #This section contains timer and auto-reset options.
 
 #All values in this section are calculated in seconds if not stated otherwise!

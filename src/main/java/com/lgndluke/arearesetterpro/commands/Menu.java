@@ -589,11 +589,13 @@ public class Menu implements CommandExecutor {
             //SQL Statements to get necessary information.
             String sqlTimesReset = "";
             String sqlOverallBlocks = "";
+            String sqlSavedEntites = "";
             String sqlCreatedOn = "";
             try {
                 ResultSet areaStats = DatabaseHandler.getAreaStats(UUID.fromString(sqlAreaUUID));
                 sqlTimesReset = String.valueOf(areaStats.getInt("timesReset"));
                 sqlOverallBlocks = String.valueOf(areaStats.getLong("overallBlocks"));
+                sqlSavedEntites = String.valueOf(areaStats.getBoolean("entitiesSaved"));
                 sqlCreatedOn = String.valueOf(areaStats.getObject("createdOn"));
                 areaStats.close();
             } catch (SQLException se) {
@@ -604,7 +606,8 @@ public class Menu implements CommandExecutor {
             List<Component> statsItemLoreList = MessageHandler.getMessagesAsComponentList("StatsItemLore");
             statsItemLoreList.set(2, statsItemLoreList.get(2).appendSpace().append(Component.text(sqlTimesReset)));
             statsItemLoreList.set(3, statsItemLoreList.get(3).appendSpace().append(Component.text(sqlOverallBlocks)));
-            statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(sqlCreatedOn)));
+            statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(sqlSavedEntites)));
+            statsItemLoreList.set(5, statsItemLoreList.get(5).appendSpace().append(Component.text(sqlCreatedOn)));
             statsItemMeta.lore(statsItemLoreList);
 
             //Assemble metadata back to item.
@@ -665,12 +668,14 @@ public class Menu implements CommandExecutor {
             //SQL Statements to get necessary information.
             String sqlTimesReset = "";
             String sqlOverallBlocks = "";
+            String sqlSavedEntites = "";
             String sqlCreatedOn = "";
             try {
                 ResultSet areaData = DatabaseHandler.getAreaData(areaName);
                 ResultSet areaStats = DatabaseHandler.getAreaStats(UUID.fromString(areaData.getString("uuid")));
                 sqlTimesReset = String.valueOf(areaStats.getInt("timesReset"));
                 sqlOverallBlocks = String.valueOf(areaStats.getLong("overallBlocks"));
+                sqlSavedEntites = String.valueOf(areaStats.getBoolean("entitiesSaved"));
                 sqlCreatedOn = String.valueOf(areaStats.getObject("createdOn"));
                 areaData.close();
                 areaStats.close();
@@ -682,7 +687,8 @@ public class Menu implements CommandExecutor {
             List<Component> statsItemLoreList = MessageHandler.getMessagesAsComponentList("StatsItemLore");
             statsItemLoreList.set(2, statsItemLoreList.get(2).appendSpace().append(Component.text(sqlTimesReset)));
             statsItemLoreList.set(3, statsItemLoreList.get(3).appendSpace().append(Component.text(sqlOverallBlocks)));
-            statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(sqlCreatedOn)));
+            statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(sqlSavedEntites)));
+            statsItemLoreList.set(5, statsItemLoreList.get(5).appendSpace().append(Component.text(sqlCreatedOn)));
             statsItemMeta.lore(statsItemLoreList);
 
             //Assemble metadata back to item.

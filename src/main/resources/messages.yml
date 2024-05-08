@@ -199,6 +199,7 @@ StatsItemLore:
   - '<grey>--------------------------------------</grey>'
   - '<gold>Reset:</gold>'
   - '<gold>Blocks:</gold>'
+  - '<gold>Entities:</gold>'
   - '<gold>Created:</gold>'
   - '<grey>--------------------------------------</grey>'
 
