@@ -9,21 +9,18 @@ import org.bukkit.plugin.java.JavaPlugin;
  **/
 public class MetricsHandler {
 
-    //Static Attributes
     private static final int pluginID = 19274;
     private static Metrics metrics;
 
-    //Static Methods
-
     /**
-     * Establishes a connection to bStats metrics system.
+     * Establishes a connection to bStats metrics.
      **/
     public static void connect(JavaPlugin javaPlugin) {
         metrics = new Metrics(javaPlugin, pluginID);
     }
 
     /**
-     * Terminates the existing bStats metrics connection on server shutdown.
+     * Terminates an existing bStats Metrics connection.
      **/
     public static void disconnect() {
         if(metrics != null) {

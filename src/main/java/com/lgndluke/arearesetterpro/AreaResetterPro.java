@@ -15,12 +15,15 @@ public final class AreaResetterPro extends JavaPlugin {
 
     //TODO Before Releasing AreaResetterPro Version 1.4
     // -> Add Reset Trigger Events inside the Menu.
+    // -> Add Enable/Disable Resets feature for Areas.
+    // -> Add Unit-Tests to ensure the Projects quality.
+    // -> Ensure Spawnpoint is not set inside currently selected Area.
 
     @Override
     public void onEnable() {
 
         UpdateHandler.check();
-        MetricsHandler.connect(this);
+        //MetricsHandler.connect(this); --> Wait for update to JDK 21 || Self-Update Metrics to support JDK21.
         PositionsHandler.initialize();
         SpawnPointHandler.initialize();
         MessageHandler.initialize();
@@ -37,7 +40,7 @@ public final class AreaResetterPro extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        MetricsHandler.disconnect();
+        //MetricsHandler.disconnect();
         DatabaseHandler.disconnect();
 
     }
