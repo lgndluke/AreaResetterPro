@@ -43,7 +43,7 @@ public class Tool implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(sender instanceof Player) {
-            if(sender.hasPermission("areareseterpro.tool")) {
+            if(sender.hasPermission("arearesetterpro.tool")) {
                 ((Player) sender).getInventory().addItem(SetPosTool.getSetPosTool());
             } else {
                 sender.sendMessage(prefix.append(noPermission));
@@ -61,7 +61,7 @@ public class Tool implements CommandExecutor {
     private static class SetPosTool {
 
         //Static Attributes
-        private static final NamespacedKey setPosToolKey = new NamespacedKey(areaPlugin, "AreaReseterPro_PosTool");
+        private static final NamespacedKey setPosToolKey = new NamespacedKey(areaPlugin, "AreaResetterPro_PosTool");
         private static ItemStack setPosTool;
 
         //Static Methods
@@ -77,7 +77,7 @@ public class Tool implements CommandExecutor {
 
             //Change ItemStack lore.
             List<Component> loreData = new ArrayList<>();
-            loreData.add(MiniMessage.miniMessage().deserialize("<blue>Area</blue><gold>Reseter</gold><red>Pro</red>"));
+            loreData.add(MiniMessage.miniMessage().deserialize("<blue>Area</blue><gold>Resetter</gold><red>Pro</red>"));
             loreData.add(MiniMessage.miniMessage().deserialize("<grey>--------------------------------------</grey>"));
             loreData.add(MiniMessage.miniMessage().deserialize("<gold>Left-Click to set Position 1.</gold>"));
             loreData.add(MiniMessage.miniMessage().deserialize("<gold>Right-Click to set Position 2.</gold>"));

@@ -14,16 +14,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class AreaResetterPro extends JavaPlugin {
 
     //TODO Before Releasing AreaResetterPro Version 1.4
-    // -> Add Reset Trigger Events inside the Menu.
     // -> Add Enable/Disable Resets feature for Areas.
-    // -> Add Unit-Tests to ensure the Projects quality.
-    // -> Ensure Spawnpoint is not set inside currently selected Area.
+    // -> Change the entity saving mechanism to not be a config-option anymore! -> Make it a create command argument.
+    // -> Take a look at the Spawnpoint system and think about how to improve it further.
 
     @Override
     public void onEnable() {
 
         UpdateHandler.check();
-        //MetricsHandler.connect(this); --> Wait for update to JDK 21 || Self-Update Metrics to support JDK21.
+        MetricsHandler.connect(this);
         PositionsHandler.initialize();
         SpawnPointHandler.initialize();
         MessageHandler.initialize();
@@ -40,7 +39,7 @@ public final class AreaResetterPro extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        //MetricsHandler.disconnect();
+        MetricsHandler.disconnect();
         DatabaseHandler.disconnect();
 
     }

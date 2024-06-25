@@ -1,6 +1,6 @@
 package com.lgndluke.arearesetterpro.data;
 
-import org.bstats.bukkit.Metrics;
+import com.lgndluke.arearesetterpro.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
