@@ -2,8 +2,13 @@ package com.lgndluke.arearesetterpro.commands;
 
 import com.fastasyncworldedit.core.FaweAPI;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.data.*;
+import com.lgndluke.arearesetterpro.data.AutoResetHandler;
+import com.lgndluke.arearesetterpro.data.DatabaseHandler;
+import com.lgndluke.arearesetterpro.data.PositionsHandler;
+import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
 import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
+import com.lgndluke.lgndware.data.ConfigHandler;
+import com.lgndluke.lgndware.data.MessageHandler;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -41,9 +46,10 @@ import static com.lgndluke.arearesetterpro.data.PositionsHandler.Position.POS2;
 public class Create implements CommandExecutor {
 
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static final Component prefix = MessageHandler.getMessageAsComponent("Prefix");
-    private final Component noPermission = MessageHandler.getMessageAsComponent("NoPermission");
-    private final String executedByConsole = MessageHandler.getMessageAsString("ExecutedByConsole");
+    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
+    private final String executedByConsole = messageHandler.getMessageAsString("ExecutedByConsole");
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -70,16 +76,23 @@ public class Create implements CommandExecutor {
      * This Class handles the area-creation process.
      * @author lgndluke
      **/
-    private static class CreateThread implements Runnable {
+    private class CreateThread implements Runnable {
 
-        private final Component success = MessageHandler.getMessageAsComponent("SuccessfullySavedArea");
-        private final Component failed = MessageHandler.getMessageAsComponent("CreationFailedMessage");
-        private final Component noPos1 = MessageHandler.getMessageAsComponent("Pos1NotSet");
-        private final Component noPos2 = MessageHandler.getMessageAsComponent("Pos2NotSet");
-        private final Component noSpawn = MessageHandler.getMessageAsComponent("SpawnPointNotSet");
-        private final Component areaAlreadyExists = MessageHandler.getMessageAsComponent("AreaAlreadyExists");
-        private final Component creationStarted = MessageHandler.getMessageAsComponent("AreaCreationStartedMessage");
-        private final Component creationFinished = MessageHandler.getMessageAsComponent("CreationSucceededMessage");
+        private final PositionsHandler positionsHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getPositionsHandler();
+        private final SpawnPointHandler spawnPointHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getSpawnPointHandler();
+        private final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler();
+        private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+        private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
+        private final AutoResetHandler autoResetHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getAutoResetHandler();
+        private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+        private final Component success = messageHandler.getMessageAsComponent("SuccessfullySavedArea");
+        private final Component failed = messageHandler.getMessageAsComponent("CreationFailedMessage");
+        private final Component noPos1 = messageHandler.getMessageAsComponent("Pos1NotSet");
+        private final Component noPos2 = messageHandler.getMessageAsComponent("Pos2NotSet");
+        private final Component noSpawn = messageHandler.getMessageAsComponent("SpawnPointNotSet");
+        private final Component areaAlreadyExists = messageHandler.getMessageAsComponent("AreaAlreadyExists");
+        private final Component creationStarted = messageHandler.getMessageAsComponent("AreaCreationStartedMessage");
+        private final Component creationFinished = messageHandler.getMessageAsComponent("CreationSucceededMessage");
         private final Player player;
         private final String areaName;
 
@@ -111,15 +124,15 @@ public class Create implements CommandExecutor {
                 createAreaDataFolder();
 
                 UUID uuid = UUID.randomUUID();
-                DatabaseHandler.insertAreaData(uuid, areaName, positions[0].getWorld().getName(), positions[0], positions[1], spawnpoint);
+                databaseHandler.insertAreaData(uuid, areaName, positions[0].getWorld().getName(), positions[0], positions[1], spawnpoint);
                 saveAreaDataSchematics(uuid, positions);
-                DatabaseHandler.insertAreaStats(uuid, ((long) (Math.abs(positions[0].getBlockX() - positions[1].getBlockX()) + 1) *
+                databaseHandler.insertAreaStats(uuid, ((long) (Math.abs(positions[0].getBlockX() - positions[1].getBlockX()) + 1) *
                                                               (Math.abs(positions[0].getBlockY() - positions[1].getBlockY()) + 1) *
                                                               (Math.abs(positions[0].getBlockZ() - positions[1].getBlockZ()) + 1)));
 
-                int configTimerValue = (int) ConfigHandler.get("DefaultTimerValue");
-                DatabaseHandler.insertAreaTimer(uuid, configTimerValue);
-                AutoResetHandler.addNewAutoResetter(areaName, configTimerValue);
+                int configTimerValue = (int) configHandler.get("DefaultTimerValue");
+                databaseHandler.insertAreaTimer(uuid, configTimerValue);
+                autoResetHandler.addNewAutoResetter(areaName, configTimerValue);
                 AreaResetterProExpansion.updateValues();
 
                 player.sendMessage(prefix.append(success));
@@ -138,7 +151,7 @@ public class Create implements CommandExecutor {
 
         private Location[] getLocations() {
 
-            Location[] positions = new Location[] { PositionsHandler.getPosition(POS1), PositionsHandler.getPosition(POS2) };
+            Location[] positions = new Location[] { positionsHandler.getPosition(POS1), positionsHandler.getPosition(POS2) };
 
             if(positions[0] == null) {
                 player.sendMessage(prefix.append(noPos1));
@@ -154,7 +167,7 @@ public class Create implements CommandExecutor {
 
         private Location getSpawnpoint() {
 
-            Location spawnpoint = SpawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT);
+            Location spawnpoint = spawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT);
 
             if(spawnpoint == null) {
                 player.sendMessage(prefix.append(noSpawn));
@@ -168,7 +181,7 @@ public class Create implements CommandExecutor {
         private boolean validAreaName() {
 
             try {
-                ResultSet areaData = DatabaseHandler.getAreaData();
+                ResultSet areaData = databaseHandler.getAreaData();
                 while(areaData.next()) {
                     if(Objects.equals(areaData.getString("areaName"), areaName)) {
                         player.sendMessage(prefix.append(areaAlreadyExists));
@@ -209,7 +222,7 @@ public class Create implements CommandExecutor {
             Clipboard clip = new BlockArrayClipboard(region);
             EditSession editSession = WorldEdit.getInstance().newEditSession(FaweAPI.getWorld(positions[0].getWorld().getName()));
             ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(editSession, region, clip, region.getMinimumPoint());
-            forwardExtentCopy.setCopyingEntities((boolean) ConfigHandler.get("SaveEntities"));
+            forwardExtentCopy.setCopyingEntities((boolean) configHandler.get("SaveEntities"));
             Operations.complete(forwardExtentCopy);
             editSession.close();
             clip.save(data, BuiltInClipboardFormat.FAST);

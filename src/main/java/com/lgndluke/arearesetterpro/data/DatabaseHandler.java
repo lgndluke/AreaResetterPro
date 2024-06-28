@@ -2,234 +2,273 @@ package com.lgndluke.arearesetterpro.data;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
+import com.lgndluke.lgndware.data.AbstractDatabaseHandler;
+import com.lgndluke.lgndware.data.ConfigHandler;
 import org.bukkit.Location;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
  * This class handles database operations.
  * @author lgndluke
  **/
-public class DatabaseHandler {
+public class DatabaseHandler extends AbstractDatabaseHandler {
 
-    private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static final String dbPath = areaPlugin.getDataFolder().getAbsolutePath() + "/AreaResetterPro.db";
-    private static Connection dbCon;
+    public DatabaseHandler(JavaPlugin plugin) {
+        super(plugin);
+    }
 
-    public static void initialize() {
-
-        new Thread(() -> {
+    @Override
+    public void initialize() {
+        FutureTask<Void> initAbstractDatabaseHandler = new FutureTask<>(() -> {
             createDatabase();
             connect();
             createTables();
-            //Enable auto-resetter.
-            if((boolean) ConfigHandler.get("EnableAutoResets")) {
-                AutoResetHandler.initialize();
-            }
             //Enable PlaceholderAPI expansion.
             AreaResetterProExpansion.updateValues();
-        }).start();
-
+            return null;
+        });
+        super.getAsyncExecutor().execute(initAbstractDatabaseHandler);
     }
 
-    public static void disconnect() {
-        if(dbCon != null) {
+    public ResultSet getAreaData() {
+        FutureTask<ResultSet> getAreaDataTask = new FutureTask<>(() -> {
             try {
-                dbCon.close();
+                PreparedStatement prepState = super.getDbCon().prepareStatement("SELECT * FROM AreaData;");
+                return prepState.executeQuery();
             } catch (SQLException se) {
-                areaPlugin.getLogger().log(Level.SEVERE, "Error whilst trying to close the database connection!", se);
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                return null;
             }
-        }
+        });
+        return super.getAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaDataTask, 10, TimeUnit.SECONDS);
     }
 
-    public static ResultSet getAreaData() {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("SELECT * FROM AreaData;");
-            return prepState.executeQuery();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+    public ResultSet getAreaData(String areaName) {
+        FutureTask<ResultSet> getAreaDataTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("SELECT * FROM AreaData WHERE areaName = ?;");
+                prepState.setString(1, areaName);
+                return prepState.executeQuery();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                return null;
+            }
+        });
+        return super.getAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaDataTask, 10, TimeUnit.SECONDS);
+    }
+
+    public void insertAreaData(UUID uuid, String areaName, String worldName, Location pos1, Location pos2, Location spawn) {
+        FutureTask<Void> insertAreaDataTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("INSERT INTO AreaData " +
+                        "(uuid, areaName, world, xValPos1, yValPos1, zValPos1, xValPos2, yValPos2, zValPos2, xValSpawn, yValSpawn, zValSpawn)" +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+
+                prepState.setString(1, uuid.toString());
+                prepState.setString(2, areaName);
+                prepState.setString(3, worldName);
+                prepState.setInt(4, pos1.getBlockX());
+                prepState.setInt(5, pos1.getBlockY());
+                prepState.setInt(6, pos1.getBlockZ());
+                prepState.setInt(7, pos2.getBlockX());
+                prepState.setInt(8, pos2.getBlockY());
+                prepState.setInt(9, pos2.getBlockZ());
+                prepState.setInt(10, spawn.getBlockX());
+                prepState.setInt(11, spawn.getBlockY());
+                prepState.setInt(12, spawn.getBlockZ());
+
+                prepState.execute();
+                prepState.close();
+
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't insert AreaData!", se);
+            }
             return null;
-        }
+        });
+        super.getAsyncExecutor().execute(insertAreaDataTask);
     }
 
-    public static ResultSet getAreaData(String areaName) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("SELECT * FROM AreaData WHERE areaName = ?;");
-            prepState.setString(1, areaName);
-            return prepState.executeQuery();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+    public void deleteAreaData(String areaName) {
+        FutureTask<Void> deleteAreaDataTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("DELETE FROM AreaData WHERE areaName = ?;");
+                prepState.setString(1, areaName);
+                prepState.execute();
+                prepState.close();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't delete AreaData!", se);
+            }
             return null;
-        }
+        });
+        super.getAsyncExecutor().execute(deleteAreaDataTask);
     }
 
-    public static void insertAreaData(UUID uuid, String areaName, String worldName, Location pos1, Location pos2, Location spawn) {
-        try {
-
-            PreparedStatement prepState = dbCon.prepareStatement("INSERT INTO AreaData " +
-                    "(uuid, areaName, world, xValPos1, yValPos1, zValPos1, xValPos2, yValPos2, zValPos2, xValSpawn, yValSpawn, zValSpawn)" +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-
-            prepState.setString(1, uuid.toString());
-            prepState.setString(2, areaName);
-            prepState.setString(3, worldName);
-            prepState.setInt(4, pos1.getBlockX());
-            prepState.setInt(5, pos1.getBlockY());
-            prepState.setInt(6, pos1.getBlockZ());
-            prepState.setInt(7, pos2.getBlockX());
-            prepState.setInt(8, pos2.getBlockY());
-            prepState.setInt(9, pos2.getBlockZ());
-            prepState.setInt(10, spawn.getBlockX());
-            prepState.setInt(11, spawn.getBlockY());
-            prepState.setInt(12, spawn.getBlockZ());
-
-            prepState.execute();
-            prepState.close();
-
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't insert AreaData!", se);
-        }
-
+    public ResultSet getAreaStats(UUID uuid) {
+        FutureTask<ResultSet> getAreaStatsTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("SELECT * FROM AreaStats WHERE uuid = ?;");
+                prepState.setObject(1, uuid);
+                return prepState.executeQuery();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaStats!", se);
+                return null;
+            }
+        });
+        return super.getAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
-    public static void deleteAreaData(String areaName) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("DELETE FROM AreaData WHERE areaName = ?;");
-            prepState.setString(1, areaName);
-            prepState.execute();
-            prepState.close();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't delete AreaData!", se);
-        }
-    }
-
-    public static ResultSet getAreaStats(UUID uuid) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("SELECT * FROM AreaStats WHERE uuid = ?;");
-            prepState.setObject(1, uuid);
-            return prepState.executeQuery();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaStats!", se);
+    public void insertAreaStats(UUID uuid, long overallBlocks) {
+        final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler(); //TODO FIX!
+        FutureTask<Void> insertAreaStatsTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("INSERT INTO AreaStats (uuid, timesReset, overallBlocks, entitiesSaved, createdOn) VALUES (?, 0, ?, ?, ?);");
+                prepState.setString(1, uuid.toString());
+                prepState.setLong(2, overallBlocks);
+                prepState.setBoolean(3, (boolean) configHandler.get("SaveEntities"));
+                prepState.setString(4, new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
+                prepState.execute();
+                prepState.close();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't insert AreaStats!", se);
+            }
             return null;
-        }
+        });
+        super.getAsyncExecutor().execute(insertAreaStatsTask);
     }
 
-    public static void insertAreaStats(UUID uuid, long overallBlocks) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("INSERT INTO AreaStats (uuid, timesReset, overallBlocks, entitiesSaved, createdOn) VALUES (?, 0, ?, ?, ?);");
-            prepState.setString(1, uuid.toString());
-            prepState.setLong(2, overallBlocks);
-            prepState.setBoolean(3, (boolean) ConfigHandler.get("SaveEntities"));
-            prepState.setString(4, new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
-            prepState.execute();
-            prepState.close();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't insert AreaStats!", se);
-        }
-    }
-
-    public static void updateAreaStatsTimesReset(UUID uuid, int timesReset) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("UPDATE AreaStats SET timesReset = ? WHERE uuid = ?;");
-            prepState.setInt(1, Math.addExact(timesReset, 1));
-            prepState.setObject(2, uuid);
-            prepState.execute();
-            prepState.close();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't update AreaStats 'timesReset'!", se);
-        }
-    }
-
-    public static void deleteAreaStats(UUID uuid) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("DELETE FROM AreaStats WHERE uuid = ?;");
-            prepState.setObject(1, uuid);
-            prepState.execute();
-            prepState.close();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't delete AreaStats", se);
-        }
-    }
-
-    public static ResultSet getAreaTimer(UUID uuid) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("SELECT * FROM AreaTimer WHERE uuid = ?;");
-            prepState.setObject(1, uuid);
-            return prepState.executeQuery();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaTimer!", se);
+    public void updateAreaStatsTimesReset(UUID uuid, int timesReset) {
+        FutureTask<Void> updateAreaStatsTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("UPDATE AreaStats SET timesReset = ? WHERE uuid = ?;");
+                prepState.setInt(1, Math.addExact(timesReset, 1));
+                prepState.setObject(2, uuid);
+                prepState.execute();
+                prepState.close();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't update AreaStats 'timesReset'!", se);
+            }
             return null;
-        }
+        });
+        super.getAsyncExecutor().execute(updateAreaStatsTask);
     }
 
-    public static void insertAreaTimer(UUID uuid, int configTimerValue) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("INSERT INTO AreaTimer (uuid, timerValue) VALUES (?, ?);");
-            prepState.setString(1, uuid.toString());
-            prepState.setInt(2, Math.max(configTimerValue, 1));
-            prepState.execute();
-            prepState.close();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't insert AreaTimer!", se);
-        }
+    public void deleteAreaStats(UUID uuid) {
+        FutureTask<Void> deleteAreaStatsTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("DELETE FROM AreaStats WHERE uuid = ?;");
+                prepState.setObject(1, uuid);
+                prepState.execute();
+                prepState.close();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't delete AreaStats", se);
+            }
+            return null;
+        });
+        super.getAsyncExecutor().execute(deleteAreaStatsTask);
     }
 
-    public static void updateAreaTimerTimerValue(UUID uuid, int timerValue) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("UPDATE AreaTimer SET timerValue = ? WHERE uuid = ?;");
-            prepState.setInt(1, Math.max(timerValue, 1));
-            prepState.setObject(2, uuid);
-            prepState.execute();
-            prepState.close();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't update AreaTimer 'timerValue'!", se);
-        }
+    public ResultSet getAreaTimer(UUID uuid) {
+        FutureTask<ResultSet> getAreaTimerTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("SELECT * FROM AreaTimer WHERE uuid = ?;");
+                prepState.setObject(1, uuid);
+                return prepState.executeQuery();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaTimer!", se);
+                return null;
+            }
+        });
+        return super.getAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaTimerTask, 10, TimeUnit.SECONDS);
     }
 
-    public static void deleteAreaTimer(UUID uuid) {
-        try {
-            PreparedStatement prepState = dbCon.prepareStatement("DELETE FROM AreaTimer WHERE uuid = ?;");
-            prepState.setObject(1, uuid);
-            prepState.execute();
-            prepState.close();
-        } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't delete AreaTimer!", se);
-        }
+    public void insertAreaTimer(UUID uuid, int configTimerValue) {
+        FutureTask<Void> insertAreaTimerTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("INSERT INTO AreaTimer (uuid, timerValue) VALUES (?, ?);");
+                prepState.setString(1, uuid.toString());
+                prepState.setInt(2, Math.max(configTimerValue, 1));
+                prepState.execute();
+                prepState.close();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't insert AreaTimer!", se);
+            }
+            return null;
+        });
+        super.getAsyncExecutor().execute(insertAreaTimerTask);
     }
 
-    private static void createDatabase() {
+    public void updateAreaTimerTimerValue(UUID uuid, int timerValue) {
+        FutureTask<Void> updateAreaTimerTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("UPDATE AreaTimer SET timerValue = ? WHERE uuid = ?;");
+                prepState.setInt(1, Math.max(timerValue, 1));
+                prepState.setObject(2, uuid);
+                prepState.execute();
+                prepState.close();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't update AreaTimer 'timerValue'!", se);
+            }
+            return null;
+        });
+        super.getAsyncExecutor().execute(updateAreaTimerTask);
+    }
+
+    public void deleteAreaTimer(UUID uuid) {
+        FutureTask<Void> deleteAreaStatsTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("DELETE FROM AreaTimer WHERE uuid = ?;");
+                prepState.setObject(1, uuid);
+                prepState.execute();
+                prepState.close();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't delete AreaTimer!", se);
+            }
+            return null;
+        });
+        super.getAsyncExecutor().execute(deleteAreaStatsTask);
+    }
+
+    @Override
+    protected void createDatabase() {
 
         try {
-            areaPlugin.getLogger().log(Level.INFO, "Looking for SQLite-Database ... ");
-            File database = new File(dbPath);
+            super.getPlugin().getLogger().log(Level.INFO, "Looking for SQLite-Database ... ");
+            File database = new File(super.getDbPath());
             boolean isCreated = database.createNewFile();
 
             if(isCreated) {
-                areaPlugin.getLogger().log(Level.WARNING, "No Database was found!");
-                areaPlugin.getLogger().log(Level.INFO, "Trying to create new Database ... ");
-                areaPlugin.getLogger().log(Level.INFO, "Successfully created new Database.");
+                super.getPlugin().getLogger().log(Level.WARNING, "No Database was found!");
+                super.getPlugin().getLogger().log(Level.INFO, "Trying to create new Database ... ");
+                super.getPlugin().getLogger().log(Level.INFO, "Successfully created new Database.");
             } else {
-                areaPlugin.getLogger().log(Level.INFO, "Existing Database was found.");
+                super.getPlugin().getLogger().log(Level.INFO, "Existing Database was found.");
             }
 
         } catch (IOException io) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Failed to create new Database!");
-            areaPlugin.getLogger().log(Level.SEVERE, "A IO-Exception occurred.", io);
+            super.getPlugin().getLogger().log(Level.SEVERE, "Failed to create new Database!");
+            super.getPlugin().getLogger().log(Level.SEVERE, "A IO-Exception occurred.", io);
         } catch (SecurityException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Failed to create new Database!");
-            areaPlugin.getLogger().log(Level.SEVERE, "A SecurityException occurred", se);
+            super.getPlugin().getLogger().log(Level.SEVERE, "Failed to create new Database!");
+            super.getPlugin().getLogger().log(Level.SEVERE, "A SecurityException occurred", se);
         }
 
     }
 
-    private static void createTables() {
+    @Override
+    protected void createTables() {
 
         String sqlAreaData = "CREATE TABLE IF NOT EXISTS AreaData (" +
                 "uuid TEXT NOT NULL, " +
@@ -273,27 +312,15 @@ public class DatabaseHandler {
                 ");";
 
         try {
-            Statement dbStatement = dbCon.createStatement();
+            Statement dbStatement = super.getDbCon().createStatement();
             dbStatement.execute(sqlAreaData);
             dbStatement.execute(sqlStats);
             dbStatement.execute(sqlTimer);
             dbStatement.close();
         } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't create Database-Tables!", se);
+            super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't create Database-Tables!", se);
         }
 
-    }
-
-    private static void connect() {
-        String dbURL = "jdbc:sqlite:" + dbPath;
-        try {
-            dbCon = DriverManager.getConnection(dbURL);
-            if(dbCon != null) {
-                areaPlugin.getLogger().log(Level.INFO, "Successfully connected to Database.");
-            }
-        } catch (Exception e) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't connect to Database", e);
-        }
     }
 
 }

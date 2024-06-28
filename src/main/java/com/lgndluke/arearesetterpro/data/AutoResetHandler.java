@@ -3,6 +3,8 @@ package com.lgndluke.arearesetterpro.data;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
+import com.lgndluke.lgndware.data.AbstractHandler;
+import com.lgndluke.lgndware.data.MessageHandler;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -10,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,27 +30,33 @@ import java.util.logging.Level;
  * This Class handles automatic resets.
  * @author lgndluke
  **/
-public class AutoResetHandler {
+public class AutoResetHandler extends AbstractHandler {
 
-    //Static Attributes
-    private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static final Component prefix = MessageHandler.getMessageAsComponent("Prefix");
-    private static final Component resetMsgPlayer = MessageHandler.getMessageAsComponent("ResetMessagePlayer");
+    private final Plugin areaPlugin = super.getPlugin();
+    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
+    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private final Component resetMsgPlayer = messageHandler.getMessageAsComponent("ResetMessagePlayer");
     private static final List<AutoResetter> autoResetterList = new ArrayList<>();
+
+    public AutoResetHandler(JavaPlugin plugin) {
+        super(plugin);
+    }
 
     //Static Methods
     /**
      * Initialization inside DatabaseHandler!
      * Otherwise, DbCon might not be ready when this is trying to init.
      **/
-    public static void initialize() {
+    @Override
+    public void initialize() {
         //Start auto-resetter for every area.
-        ResultSet areaData = DatabaseHandler.getAreaData();
+        ResultSet areaData = databaseHandler.getAreaData();
         ResultSet areaTimer = null;
         try {
             if(areaData != null) {
                 while (areaData.next()) {
-                    areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                    areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                     addNewAutoResetter(areaData.getString("areaName"),
                                        areaTimer.getLong("timerValue"));
                 }
@@ -57,18 +66,23 @@ public class AutoResetHandler {
                 areaTimer.close();
             }
         } catch(NumberFormatException nfe) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Failed to enable auto-resetter", nfe);
+            super.getPlugin().getLogger().log(Level.SEVERE, "Failed to enable auto-resetter", nfe);
         } catch (SQLException se) {
-            areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+            super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
         }
 
     }
 
-    public static void addNewAutoResetter(String areaName, long resetInterval) {
+    @Override
+    public void terminate() {
+        super.getAsyncExecutor().shutdown();
+    }
+
+    public void addNewAutoResetter(String areaName, long resetInterval) {
         autoResetterList.add(new AutoResetter(areaName, resetInterval*20));
     }
 
-    public static void updateAreaResetInterval(String areaName, long resetInterval) {
+    public void updateAreaResetInterval(String areaName, long resetInterval) {
         for(AutoResetter autoResetter : autoResetterList) {
             if(autoResetter.getAreaName().equals(areaName)) {
                 autoResetter.setResetInterval(resetInterval*20);
@@ -76,7 +90,7 @@ public class AutoResetHandler {
         }
     }
 
-    public static void removeAreaResetter(String areaName) {
+    public void removeAreaResetter(String areaName) {
         for(AutoResetter autoResetter : autoResetterList) {
             if(autoResetter.getAreaName().equals(areaName)) {
                 autoResetter = null;
@@ -85,7 +99,7 @@ public class AutoResetHandler {
         }
     }
 
-    public static long getTimeRemaining(String areaName) {
+    public long getTimeRemaining(String areaName) {
         for(AutoResetter autoResetter : autoResetterList) {
             if(autoResetter.getAreaName().equals(areaName)) {
                 return autoResetter.timeRemaining;
@@ -95,7 +109,7 @@ public class AutoResetHandler {
     }
 
     //Inner Classes
-    private static class AutoResetter implements Runnable {
+    private class AutoResetter implements Runnable {
 
         //Attributes
         private final String areaName;
@@ -117,7 +131,7 @@ public class AutoResetHandler {
 
             try {
 
-                ResultSet results = DatabaseHandler.getAreaData();
+                ResultSet results = databaseHandler.getAreaData();
 
                 while(results.next()) {
 
@@ -140,7 +154,7 @@ public class AutoResetHandler {
 
                         results.close();
 
-                        ResultSet areaStats = DatabaseHandler.getAreaStats(uuid);
+                        ResultSet areaStats = databaseHandler.getAreaStats(uuid);
                         int timesReset = areaStats.getInt("timesReset");
                         areaStats.close();
 
@@ -160,7 +174,7 @@ public class AutoResetHandler {
                         });
 
                         FaweAPI.load(worldData).paste(FaweAPI.getWorld(worldName), BlockVector3.at(Math.min(xVal1, xVal2), Math.min(yVal1, yVal2), Math.min(zVal1, zVal2)));
-                        DatabaseHandler.updateAreaStatsTimesReset(uuid, timesReset);
+                        databaseHandler.updateAreaStatsTimesReset(uuid, timesReset);
 
                     }
 

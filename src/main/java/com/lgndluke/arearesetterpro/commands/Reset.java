@@ -3,15 +3,13 @@ package com.lgndluke.arearesetterpro.commands;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
-import com.lgndluke.arearesetterpro.data.MessageHandler;
-import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
 import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
+import com.lgndluke.lgndware.data.MessageHandler;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -36,8 +34,9 @@ public class Reset implements CommandExecutor {
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static final Component prefix = MessageHandler.getMessageAsComponent("Prefix");
-    private final Component noPermission = MessageHandler.getMessageAsComponent("NoPermission");
+    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
 
     //CommandExecutor
     @Override
@@ -73,9 +72,12 @@ public class Reset implements CommandExecutor {
     protected static class ResetArea implements Runnable {
 
         //Attributes
-        private final Component success = MessageHandler.getMessageAsComponent("AreaResetSuccessful");
-        private final Component nonExist = MessageHandler.getMessageAsComponent("AreaNonExistent");
-        private final Component resetMsgPlayer = MessageHandler.getMessageAsComponent("ResetMessagePlayer");
+        private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
+        private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+        private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+        private final Component success = messageHandler.getMessageAsComponent("AreaResetSuccessful");
+        private final Component nonExist = messageHandler.getMessageAsComponent("AreaNonExistent");
+        private final Component resetMsgPlayer = messageHandler.getMessageAsComponent("ResetMessagePlayer");
         private final CommandSender sender;
         private final String areaName;
 
@@ -90,7 +92,7 @@ public class Reset implements CommandExecutor {
             //-----------------------------------------------------------
             //Define SQL-Statements and UUID as String.
             try {
-                ResultSet results = DatabaseHandler.getAreaData();
+                ResultSet results = databaseHandler.getAreaData();
                 while(results.next()) {
 
                     if(results.getString("areaName").equals(areaName)) {
@@ -111,7 +113,7 @@ public class Reset implements CommandExecutor {
 
                         results.close();
 
-                        ResultSet areaStats = DatabaseHandler.getAreaStats(uuid);
+                        ResultSet areaStats = databaseHandler.getAreaStats(uuid);
                         int timesReset = areaStats.getInt("timesReset");
                         areaStats.close();
 
@@ -129,7 +131,7 @@ public class Reset implements CommandExecutor {
                         }
 
                         FaweAPI.load(worldData).paste(FaweAPI.getWorld(worldName), BlockVector3.at(Math.min(xVal1, xVal2), Math.min(yVal1, yVal2), Math.min(zVal1, zVal2)));
-                        DatabaseHandler.updateAreaStatsTimesReset(uuid, timesReset);
+                        databaseHandler.updateAreaStatsTimesReset(uuid, timesReset);
 
                         if(sender instanceof Player) {
                             sender.sendMessage(prefix.append(this.success));
@@ -188,6 +190,7 @@ public class Reset implements CommandExecutor {
     protected static class ResetAllAreas implements Runnable {
 
         //Attributes
+        private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
         private final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
         private final CommandSender sender;
 
@@ -199,7 +202,7 @@ public class Reset implements CommandExecutor {
         @Override
         public void run() {
             try {
-                ResultSet results = DatabaseHandler.getAreaData();
+                ResultSet results = databaseHandler.getAreaData();
                 while (results.next()) {
                     areaPlugin.getServer().getScheduler().runTaskAsynchronously(areaPlugin, new ResetArea(sender, results.getString("areaName")));
                 }

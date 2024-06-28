@@ -22,6 +22,8 @@ public class AreaResetterProExpansion extends PlaceholderExpansion {
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
+    private static final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
+    private final AutoResetHandler autoResetHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getAutoResetHandler();
     private final String identifier = areaPlugin.getPluginMeta().getName();
     private final String author = areaPlugin.getPluginMeta().getAuthors().get(0);
     private final String version = areaPlugin.getPluginMeta().getVersion();
@@ -56,7 +58,7 @@ public class AreaResetterProExpansion extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String areaName) {
         if(areaData.contains(areaName)) {
-            long timerValue = AutoResetHandler.getTimeRemaining(areaName);
+            long timerValue = autoResetHandler.getTimeRemaining(areaName);
             long hours = timerValue / 3600;
             long minutes = (timerValue % 3600) / 60;
             long seconds = timerValue % 60;
@@ -67,7 +69,7 @@ public class AreaResetterProExpansion extends PlaceholderExpansion {
 
     public static void updateValues() {
         try {
-            ResultSet results = DatabaseHandler.getAreaData();
+            ResultSet results = databaseHandler.getAreaData();
             if(results != null) {
                 while (results.next()) {
                     areaData.add(results.getString("areaName"));

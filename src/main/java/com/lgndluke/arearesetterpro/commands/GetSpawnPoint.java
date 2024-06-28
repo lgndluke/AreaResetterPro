@@ -1,9 +1,9 @@
 package com.lgndluke.arearesetterpro.commands;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.data.MessageHandler;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
 import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
+import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
@@ -23,9 +23,10 @@ public class GetSpawnPoint implements CommandExecutor {
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static final Component prefix = MessageHandler.getMessageAsComponent("Prefix");
-    private final Component noPermission = MessageHandler.getMessageAsComponent("NoPermission");
-    private final String executedByConsole = MessageHandler.getMessageAsString("ExecutedByConsole");
+    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
+    private final String executedByConsole = messageHandler.getMessageAsString("ExecutedByConsole");
 
     //CommandExecutor
     @Override
@@ -49,8 +50,12 @@ public class GetSpawnPoint implements CommandExecutor {
      **/
     private static class GetPosThread implements Runnable {
 
-        //Attribute
-        private final Component noSpawn = MessageHandler.getMessageAsComponent("SpawnPointNotSet");
+        //Attributes
+        private final PositionsHandler positionsHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getPositionsHandler();
+        private final SpawnPointHandler spawnPointHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getSpawnPointHandler();
+        private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+        private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+        private final Component noSpawn = messageHandler.getMessageAsComponent("SpawnPointNotSet");
         private final CommandSender sender;
 
         //Constructor
@@ -61,16 +66,16 @@ public class GetSpawnPoint implements CommandExecutor {
         @Override
         public void run() {
 
-            if(SpawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT) != null){
+            if(spawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT) != null){
 
                 Component spawn = MiniMessage.miniMessage().deserialize("<blue> Spawnpoint:</blue> \n" +
-                        "<light_purple>x: " + SpawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT).getX() + "\n" +
-                        "y: " + SpawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT).getY() + "\n" +
-                        "z: " + SpawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT).getZ() + "</light_purple>");
+                        "<light_purple>x: " + spawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT).getX() + "\n" +
+                        "y: " + spawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT).getY() + "\n" +
+                        "z: " + spawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT).getZ() + "</light_purple>");
 
                 sender.sendMessage(prefix.append(spawn));
 
-            } else if(PositionsHandler.getPosition(PositionsHandler.Position.POS1) == null) {
+            } else if(positionsHandler.getPosition(PositionsHandler.Position.POS1) == null) {
                 sender.sendMessage(prefix.append(noSpawn));
             }
 

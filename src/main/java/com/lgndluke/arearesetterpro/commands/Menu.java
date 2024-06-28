@@ -2,10 +2,10 @@ package com.lgndluke.arearesetterpro.commands;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.data.AutoResetHandler;
-import com.lgndluke.arearesetterpro.data.ConfigHandler;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
-import com.lgndluke.arearesetterpro.data.MessageHandler;
 import com.lgndluke.arearesetterpro.loaders.ListenerLoader;
+import com.lgndluke.lgndware.data.ConfigHandler;
+import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -39,9 +39,14 @@ public class Menu implements CommandExecutor {
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static final Component prefix = MessageHandler.getMessageAsComponent("Prefix");
-    private final Component noPermission = MessageHandler.getMessageAsComponent("NoPermission");
-    private final String executedByConsole = MessageHandler.getMessageAsString("ExecutedByConsole");
+    private final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler();
+    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
+    private final ListenerLoader listenerLoader = AreaResetterPro.getPlugin(AreaResetterPro.class).getListenerLoader();
+    private final AutoResetHandler autoResetHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getAutoResetHandler();
+    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
+    private final String executedByConsole = messageHandler.getMessageAsString("ExecutedByConsole");
 
     //CommandExecutor
     @Override
@@ -63,7 +68,7 @@ public class Menu implements CommandExecutor {
     /**
      * Method that provides Inventory objects with empty item objects.
      **/
-    private static ItemStack getEmptyItem() {
+    private ItemStack getEmptyItem() {
         ItemStack emptyItem = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1);
         //-----------------------------------------------------------
         //Initialize emptyItem.
@@ -72,10 +77,10 @@ public class Menu implements CommandExecutor {
         ItemMeta emptyItemMeta = emptyItem.getItemMeta();
 
         //Change the object name.
-        emptyItemMeta.displayName(MessageHandler.getMessageAsComponent("EmptyItemName"));
+        emptyItemMeta.displayName(messageHandler.getMessageAsComponent("EmptyItemName"));
 
         //Change the object lore.
-        emptyItemMeta.lore(MessageHandler.getMessagesAsComponentList("EmptyItemLore"));
+        emptyItemMeta.lore(messageHandler.getMessagesAsComponentList("EmptyItemLore"));
 
         //Set NamespacedKey.
         NamespacedKey emptyKey = new NamespacedKey(areaPlugin, UUID.randomUUID().toString());
@@ -93,7 +98,7 @@ public class Menu implements CommandExecutor {
      * -> Represents the graphical in-game menu of the Plugin.
      * @author lgndluke
      **/
-    private static class AreaInventory {
+    private class AreaInventory {
 
         //Attributes
         private final List<ItemStack> contents = new ArrayList<>();
@@ -112,7 +117,7 @@ public class Menu implements CommandExecutor {
             ArrayList<String> names = new ArrayList<>();
 
             try {
-                ResultSet results = DatabaseHandler.getAreaData();
+                ResultSet results = databaseHandler.getAreaData();
                 while(results.next()) {
                     count++;
                     names.add(results.getString("areaName"));
@@ -143,7 +148,7 @@ public class Menu implements CommandExecutor {
                 addMeta.displayName(addName);
 
                 //Change the object lore.
-                addMeta.lore(MessageHandler.getMessagesAsComponentList("AreaItemLore"));
+                addMeta.lore(messageHandler.getMessagesAsComponentList("AreaItemLore"));
 
                 //Assemble metadata back to item.
                 addItem.setItemMeta(addMeta);
@@ -161,11 +166,11 @@ public class Menu implements CommandExecutor {
             ItemMeta previousPageItemMeta = previousPageItem.getItemMeta();
 
             //Change the object name.
-            Component previousItemName = MessageHandler.getMessageAsComponent("PreviousPageItemName");
+            Component previousItemName = messageHandler.getMessageAsComponent("PreviousPageItemName");
             previousPageItemMeta.displayName(previousItemName);
 
             //Change the object lore.
-            previousPageItemMeta.lore(MessageHandler.getMessagesAsComponentList("PreviousPageItemLore"));
+            previousPageItemMeta.lore(messageHandler.getMessagesAsComponentList("PreviousPageItemLore"));
 
             //Assemble metadata back to item.
             previousPageItem.setItemMeta(previousPageItemMeta);
@@ -179,11 +184,11 @@ public class Menu implements CommandExecutor {
             ItemMeta nextPageItemMeta = nextPageItem.getItemMeta();
 
             //Change the object name.
-            Component nextPageItemName = MessageHandler.getMessageAsComponent("NextPageItemName");
+            Component nextPageItemName = messageHandler.getMessageAsComponent("NextPageItemName");
             nextPageItemMeta.displayName(nextPageItemName);
 
             //Change the object lore.
-            nextPageItemMeta.lore(MessageHandler.getMessagesAsComponentList("NextPageItemLore"));
+            nextPageItemMeta.lore(messageHandler.getMessagesAsComponentList("NextPageItemLore"));
 
             //Assemble metadata back to item.
             nextPageItem.setItemMeta(nextPageItemMeta);
@@ -197,11 +202,11 @@ public class Menu implements CommandExecutor {
             ItemMeta resetAllItemMeta = resetAllItem.getItemMeta();
 
             //Change the object name.
-            Component resetItemName = MessageHandler.getMessageAsComponent("ResetItemName");
+            Component resetItemName = messageHandler.getMessageAsComponent("ResetItemName");
             resetAllItemMeta.displayName(resetItemName);
 
             //Change the object lore.
-            resetAllItemMeta.lore(MessageHandler.getMessagesAsComponentList("ResetItemLore"));
+            resetAllItemMeta.lore(messageHandler.getMessagesAsComponentList("ResetItemLore"));
 
             //Assemble metadata back to item.
             resetAllItem.setItemMeta(resetAllItemMeta);
@@ -209,7 +214,7 @@ public class Menu implements CommandExecutor {
 
             //-----------------------------------------------------------
             //Make the registered listener to listen to this inventory.
-            ListenerLoader.getAreaInvListener().setMainInv(this);
+            listenerLoader.getAreaInvListener().setMainInv(this);
             //-----------------------------------------------------------
 
             //-----------------------------------------------------------------------------------------------------
@@ -274,11 +279,11 @@ public class Menu implements CommandExecutor {
      * -> Listens to events from the GuiInventory.
      * @author lgndluke
      **/
-    public static class AreaInvListener implements Listener {
+    public class AreaInvListener implements Listener {
 
         //Attributes
-        private final Component noPrevPage = MessageHandler.getMessageAsComponent("NoPreviousPage");
-        private final Component noNextPage = MessageHandler.getMessageAsComponent("NoNextPage");
+        private final Component noPrevPage = messageHandler.getMessageAsComponent("NoPreviousPage");
+        private final Component noNextPage = messageHandler.getMessageAsComponent("NoNextPage");
         private Menu.AreaInventory inv;
         private int index = 0;
 
@@ -300,13 +305,13 @@ public class Menu implements CommandExecutor {
                         String itemName = edgedNameString.substring(1, edgedNameString.length()-1);
                         if(event.getClick().isLeftClick()) {
                             SettingsMenu settings = new SettingsMenu(itemName);
-                            ListenerLoader.getSettingsInvListener().setSettingsMenu(settings);
-                            ListenerLoader.getSettingsInvListener().setItemName(itemName);
+                            listenerLoader.getSettingsInvListener().setSettingsMenu(settings);
+                            listenerLoader.getSettingsInvListener().setItemName(itemName);
                             player.openInventory(settings.getInv());
                         } else if (event.getClick().isRightClick()) {
                             ConfirmationMenu confirmation = new ConfirmationMenu();
-                            ListenerLoader.getConfirmationInvListener().setConfirmationMenu(confirmation);
-                            ListenerLoader.getConfirmationInvListener().setItemName(itemName);
+                            listenerLoader.getConfirmationInvListener().setConfirmationMenu(confirmation);
+                            listenerLoader.getConfirmationInvListener().setItemName(itemName);
                             player.openInventory(confirmation.getInv());
                         }
                     }
@@ -368,7 +373,7 @@ public class Menu implements CommandExecutor {
      * -> Represents the graphical in-game menu to accept the removal of an area.
      * @author lgndluke
      **/
-    private static class ConfirmationMenu {
+    private class ConfirmationMenu {
 
         //Attributes
         private final ItemStack confirmationItem;
@@ -385,10 +390,10 @@ public class Menu implements CommandExecutor {
             ItemMeta confirmationItemMeta = confirmationItem.getItemMeta();
 
             //Change the object name.
-            confirmationItemMeta.displayName(MessageHandler.getMessageAsComponent("ConfirmationItemName"));
+            confirmationItemMeta.displayName(messageHandler.getMessageAsComponent("ConfirmationItemName"));
 
             //Change the object lore.
-            confirmationItemMeta.lore(MessageHandler.getMessagesAsComponentList("ConfirmationItemLore"));
+            confirmationItemMeta.lore(messageHandler.getMessagesAsComponentList("ConfirmationItemLore"));
 
             //Assemble metadata back to item.
             confirmationItem.setItemMeta(confirmationItemMeta);
@@ -402,10 +407,10 @@ public class Menu implements CommandExecutor {
             ItemMeta cancelItemMeta = cancelItem.getItemMeta();
 
             //Change the object name.
-            cancelItemMeta.displayName(MessageHandler.getMessageAsComponent("CancelItemName"));
+            cancelItemMeta.displayName(messageHandler.getMessageAsComponent("CancelItemName"));
 
             //Change the object lore.
-            cancelItemMeta.lore(MessageHandler.getMessagesAsComponentList("CancelItemLore"));
+            cancelItemMeta.lore(messageHandler.getMessagesAsComponentList("CancelItemLore"));
 
             //Assemble metadata back to item.
             cancelItem.setItemMeta(cancelItemMeta);
@@ -438,7 +443,7 @@ public class Menu implements CommandExecutor {
      * -> Listens to events from the ConfirmationMenu.
      * @author lgndluke
      **/
-    public static class ConfirmationMenuListener implements Listener {
+    public class ConfirmationMenuListener implements Listener {
 
         //Attributes
         private ConfirmationMenu confirmationMenu;
@@ -457,7 +462,7 @@ public class Menu implements CommandExecutor {
                     if(confirmationMenu.getConfirmationItem().equals(event.getCurrentItem())) {
                         areaPlugin.getServer().getScheduler().runTaskAsynchronously(areaPlugin, new Remove.Remover(player, itemName));
                         AreaInventory areaInv = new AreaInventory();
-                        player.openInventory(areaInv.getInvPage(ListenerLoader.getAreaInvListener().getIndex()));
+                        player.openInventory(areaInv.getInvPage(listenerLoader.getAreaInvListener().getIndex()));
                     }
                     //-----------------------------------------------------------
 
@@ -465,7 +470,7 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(confirmationMenu.getCancelItem().equals(event.getCurrentItem())) {
                         AreaInventory areaInv = new AreaInventory();
-                        player.openInventory(areaInv.getInvPage(ListenerLoader.getAreaInvListener().getIndex()));
+                        player.openInventory(areaInv.getInvPage(listenerLoader.getAreaInvListener().getIndex()));
                     }
                     //-----------------------------------------------------------
                     event.setCancelled(true);
@@ -490,7 +495,7 @@ public class Menu implements CommandExecutor {
      * -> Represents the graphical in-game menu to edit an Area objects properties.
      * @author lgndluke
      **/
-    private static class SettingsMenu {
+    private class SettingsMenu {
 
         //Attributes
         private final ItemStack instantResetItem;
@@ -513,10 +518,10 @@ public class Menu implements CommandExecutor {
             ItemMeta instantResetItemMeta = instantResetItem.getItemMeta();
 
             //Change the object name.
-            instantResetItemMeta.displayName(MessageHandler.getMessageAsComponent("InstantResetItemName"));
+            instantResetItemMeta.displayName(messageHandler.getMessageAsComponent("InstantResetItemName"));
 
             //Change the object lore.
-            instantResetItemMeta.lore(MessageHandler.getMessagesAsComponentList("InstantResetItemLore"));
+            instantResetItemMeta.lore(messageHandler.getMessagesAsComponentList("InstantResetItemLore"));
 
             //Assemble metadata back to item.
             instantResetItem.setItemMeta(instantResetItemMeta);
@@ -530,14 +535,14 @@ public class Menu implements CommandExecutor {
             ItemMeta timerItemMeta = timerItem.getItemMeta();
 
             //Change the object name.
-            timerItemMeta.displayName(MessageHandler.getMessageAsComponent("TimerItemName"));
+            timerItemMeta.displayName(messageHandler.getMessageAsComponent("TimerItemName"));
 
             //Get necessary database information.
             String sqlAreaUUID = "";
             int sqlTimerValue = 0;
             try {
-                ResultSet areaData = DatabaseHandler.getAreaData(areaName);
-                ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                ResultSet areaData = databaseHandler.getAreaData(areaName);
+                ResultSet areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                 sqlAreaUUID = areaData.getString("uuid");
                 sqlTimerValue = areaTimer.getInt("timerValue");
                 areaData.close();
@@ -547,7 +552,7 @@ public class Menu implements CommandExecutor {
             }
 
             //Change the object lore.
-            List<Component> timerItemLoreList = MessageHandler.getMessagesAsComponentList("TimerItemLore");
+            List<Component> timerItemLoreList = messageHandler.getMessagesAsComponentList("TimerItemLore");
             int timerVal = sqlTimerValue;
             int hours = timerVal / 3600;
             int minutes = (timerVal % 3600) / 60;
@@ -567,10 +572,10 @@ public class Menu implements CommandExecutor {
             ItemMeta teleportItemMeta = teleportItem.getItemMeta();
 
             //Change the object name.
-            teleportItemMeta.displayName(MessageHandler.getMessageAsComponent("TeleportItemName"));
+            teleportItemMeta.displayName(messageHandler.getMessageAsComponent("TeleportItemName"));
 
             //Change the object lore.
-            teleportItemMeta.lore(MessageHandler.getMessagesAsComponentList("TeleportItemLore"));
+            teleportItemMeta.lore(messageHandler.getMessagesAsComponentList("TeleportItemLore"));
 
             //Assemble metadata back to item.
             teleportItem.setItemMeta(teleportItemMeta);
@@ -584,7 +589,7 @@ public class Menu implements CommandExecutor {
             ItemMeta statsItemMeta = statsItem.getItemMeta();
 
             //Change the object name.
-            statsItemMeta.displayName(MessageHandler.getMessageAsComponent("StatsItemName"));
+            statsItemMeta.displayName(messageHandler.getMessageAsComponent("StatsItemName"));
 
             //SQL Statements to get necessary information.
             String sqlTimesReset = "";
@@ -592,7 +597,7 @@ public class Menu implements CommandExecutor {
             String sqlSavedEntites = "";
             String sqlCreatedOn = "";
             try {
-                ResultSet areaStats = DatabaseHandler.getAreaStats(UUID.fromString(sqlAreaUUID));
+                ResultSet areaStats = databaseHandler.getAreaStats(UUID.fromString(sqlAreaUUID));
                 sqlTimesReset = String.valueOf(areaStats.getInt("timesReset"));
                 sqlOverallBlocks = String.valueOf(areaStats.getLong("overallBlocks"));
                 sqlSavedEntites = String.valueOf(areaStats.getBoolean("entitiesSaved"));
@@ -603,7 +608,7 @@ public class Menu implements CommandExecutor {
             }
 
             //Change the object lore.
-            List<Component> statsItemLoreList = MessageHandler.getMessagesAsComponentList("StatsItemLore");
+            List<Component> statsItemLoreList = messageHandler.getMessagesAsComponentList("StatsItemLore");
             statsItemLoreList.set(2, statsItemLoreList.get(2).appendSpace().append(Component.text(sqlTimesReset)));
             statsItemLoreList.set(3, statsItemLoreList.get(3).appendSpace().append(Component.text(sqlOverallBlocks)));
             statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(sqlSavedEntites)));
@@ -622,10 +627,10 @@ public class Menu implements CommandExecutor {
             ItemMeta backItemMeta = backItem.getItemMeta();
 
             //Change the object name.
-            backItemMeta.displayName(MessageHandler.getMessageAsComponent("BackItemName"));
+            backItemMeta.displayName(messageHandler.getMessageAsComponent("BackItemName"));
 
             //Change the object lore.
-            backItemMeta.lore(MessageHandler.getMessagesAsComponentList("BackItemLore"));
+            backItemMeta.lore(messageHandler.getMessagesAsComponentList("BackItemLore"));
 
             //Assemble metadata back to item.
             backItem.setItemMeta(backItemMeta);
@@ -671,8 +676,8 @@ public class Menu implements CommandExecutor {
             String sqlSavedEntites = "";
             String sqlCreatedOn = "";
             try {
-                ResultSet areaData = DatabaseHandler.getAreaData(areaName);
-                ResultSet areaStats = DatabaseHandler.getAreaStats(UUID.fromString(areaData.getString("uuid")));
+                ResultSet areaData = databaseHandler.getAreaData(areaName);
+                ResultSet areaStats = databaseHandler.getAreaStats(UUID.fromString(areaData.getString("uuid")));
                 sqlTimesReset = String.valueOf(areaStats.getInt("timesReset"));
                 sqlOverallBlocks = String.valueOf(areaStats.getLong("overallBlocks"));
                 sqlSavedEntites = String.valueOf(areaStats.getBoolean("entitiesSaved"));
@@ -684,7 +689,7 @@ public class Menu implements CommandExecutor {
             }
 
             //Change the object lore.
-            List<Component> statsItemLoreList = MessageHandler.getMessagesAsComponentList("StatsItemLore");
+            List<Component> statsItemLoreList = messageHandler.getMessagesAsComponentList("StatsItemLore");
             statsItemLoreList.set(2, statsItemLoreList.get(2).appendSpace().append(Component.text(sqlTimesReset)));
             statsItemLoreList.set(3, statsItemLoreList.get(3).appendSpace().append(Component.text(sqlOverallBlocks)));
             statsItemLoreList.set(4, statsItemLoreList.get(4).appendSpace().append(Component.text(sqlSavedEntites)));
@@ -704,7 +709,7 @@ public class Menu implements CommandExecutor {
      * -> Listens to events from SettingsMenu objects.
      * @author lgndluke
      **/
-    public static class SettingsMenuListener implements Listener {
+    public class SettingsMenuListener implements Listener {
 
         //Attributes
         private SettingsMenu settingsMenu;
@@ -729,8 +734,8 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(settingsMenu.getTimerItem().equals(event.getCurrentItem())) {
                         TimerMenu timerMenu = new TimerMenu(itemName);
-                        ListenerLoader.getTimerListener().setTimerMenu(timerMenu);
-                        ListenerLoader.getTimerListener().setItemName(itemName);
+                        listenerLoader.getTimerListener().setTimerMenu(timerMenu);
+                        listenerLoader.getTimerListener().setItemName(itemName);
                         player.openInventory(timerMenu.getInv());
                     }
                     //-----------------------------------------------------------
@@ -741,7 +746,7 @@ public class Menu implements CommandExecutor {
                         //Teleport player to saved coordinates and close inventory.
                         //-----------------------------------------------------------
                         try {
-                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
+                            ResultSet areaData = databaseHandler.getAreaData(itemName);
                             World world = WorldCreator.name(areaData.getString("world")).createWorld();
                             int xVal = areaData.getInt("xValSpawn");
                             int yVal = areaData.getInt("yValSpawn");
@@ -760,7 +765,7 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(settingsMenu.getBackItem().equals(event.getCurrentItem())) {
                         AreaInventory areaInv = new AreaInventory();
-                        player.openInventory(areaInv.getInvPage(ListenerLoader.getAreaInvListener().getIndex()));
+                        player.openInventory(areaInv.getInvPage(listenerLoader.getAreaInvListener().getIndex()));
                     }
                     //-----------------------------------------------------------
                     event.setCancelled(true);
@@ -786,7 +791,7 @@ public class Menu implements CommandExecutor {
      * -> Represents the graphical in-game menu to edit an Area objects reset timer.
      * @author lgndluke
      **/
-    private static class TimerMenu {
+    private class TimerMenu {
 
         //Attributes
         private final ItemStack smallIncreaseItem;
@@ -810,10 +815,10 @@ public class Menu implements CommandExecutor {
             ItemMeta smallIncreaseItemMeta = smallIncreaseItem.getItemMeta();
 
             //Change the object name.
-            smallIncreaseItemMeta.displayName(MessageHandler.getMessageAsComponent("SmallIncreaseItemName"));
+            smallIncreaseItemMeta.displayName(messageHandler.getMessageAsComponent("SmallIncreaseItemName"));
 
             //Change the object lore.
-            smallIncreaseItemMeta.lore(MessageHandler.getMessagesAsComponentList("SmallIncreaseItemLore"));
+            smallIncreaseItemMeta.lore(messageHandler.getMessagesAsComponentList("SmallIncreaseItemLore"));
 
             //Assemble metadata back to item.
             smallIncreaseItem.setItemMeta(smallIncreaseItemMeta);
@@ -827,10 +832,10 @@ public class Menu implements CommandExecutor {
             ItemMeta mediumIncreaseItemMeta = mediumIncreaseItem.getItemMeta();
 
             //Change the object name.
-            mediumIncreaseItemMeta.displayName(MessageHandler.getMessageAsComponent("MediumIncreaseItemName"));
+            mediumIncreaseItemMeta.displayName(messageHandler.getMessageAsComponent("MediumIncreaseItemName"));
 
             //Change the object lore.
-            mediumIncreaseItemMeta.lore(MessageHandler.getMessagesAsComponentList("MediumIncreaseItemLore"));
+            mediumIncreaseItemMeta.lore(messageHandler.getMessagesAsComponentList("MediumIncreaseItemLore"));
 
             //Assemble metadata back to item.
             mediumIncreaseItem.setItemMeta(mediumIncreaseItemMeta);
@@ -844,10 +849,10 @@ public class Menu implements CommandExecutor {
             ItemMeta largeIncreaseItemMeta = largeIncreaseItem.getItemMeta();
 
             //Change the object name.
-            largeIncreaseItemMeta.displayName(MessageHandler.getMessageAsComponent("LargeIncreaseItemName"));
+            largeIncreaseItemMeta.displayName(messageHandler.getMessageAsComponent("LargeIncreaseItemName"));
 
             //Change the object lore.
-            largeIncreaseItemMeta.lore(MessageHandler.getMessagesAsComponentList("LargeIncreaseItemLore"));
+            largeIncreaseItemMeta.lore(messageHandler.getMessagesAsComponentList("LargeIncreaseItemLore"));
 
             //Assemble metadata back to item.
             largeIncreaseItem.setItemMeta(largeIncreaseItemMeta);
@@ -861,13 +866,13 @@ public class Menu implements CommandExecutor {
             ItemMeta displayTimerItemMeta = displayTimerItem.getItemMeta();
 
             //Change the object name.
-            displayTimerItemMeta.displayName(MessageHandler.getMessageAsComponent("DisplayTimerItemName"));
+            displayTimerItemMeta.displayName(messageHandler.getMessageAsComponent("DisplayTimerItemName"));
 
             //SQL Statements to get necessary information.
             int timerVal = 0;
             try {
-                ResultSet areaData = DatabaseHandler.getAreaData(areaName);
-                ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                ResultSet areaData = databaseHandler.getAreaData(areaName);
+                ResultSet areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                 timerVal = areaTimer.getInt("timerValue");
                 areaData.close();
                 areaTimer.close();
@@ -876,7 +881,7 @@ public class Menu implements CommandExecutor {
             }
 
             //Change the object lore.
-            List<Component> displayTimerItemLoreList = MessageHandler.getMessagesAsComponentList("DisplayTimerItemLore");
+            List<Component> displayTimerItemLoreList = messageHandler.getMessagesAsComponentList("DisplayTimerItemLore");
             int hours = timerVal / 3600;
             int minutes = (timerVal % 3600) / 60;
             int seconds = timerVal % 60;
@@ -895,10 +900,10 @@ public class Menu implements CommandExecutor {
             ItemMeta smallDecreaseItemMeta = smallDecreaseItem.getItemMeta();
 
             //Change the object name.
-            smallDecreaseItemMeta.displayName(MessageHandler.getMessageAsComponent("SmallDecreaseItemName"));
+            smallDecreaseItemMeta.displayName(messageHandler.getMessageAsComponent("SmallDecreaseItemName"));
 
             //Change the object lore.
-            smallDecreaseItemMeta.lore(MessageHandler.getMessagesAsComponentList("SmallDecreaseItemLore"));
+            smallDecreaseItemMeta.lore(messageHandler.getMessagesAsComponentList("SmallDecreaseItemLore"));
 
             //Assemble metadata back to item.
             smallDecreaseItem.setItemMeta(smallDecreaseItemMeta);
@@ -912,10 +917,10 @@ public class Menu implements CommandExecutor {
             ItemMeta mediumDecreaseItemMeta = mediumDecreaseItem.getItemMeta();
 
             //Change the object name.
-            mediumDecreaseItemMeta.displayName(MessageHandler.getMessageAsComponent("MediumDecreaseItemName"));
+            mediumDecreaseItemMeta.displayName(messageHandler.getMessageAsComponent("MediumDecreaseItemName"));
 
             //Change the object lore.
-            mediumDecreaseItemMeta.lore(MessageHandler.getMessagesAsComponentList("MediumDecreaseItemLore"));
+            mediumDecreaseItemMeta.lore(messageHandler.getMessagesAsComponentList("MediumDecreaseItemLore"));
 
             //Assemble metadata back to item.
             mediumDecreaseItem.setItemMeta(mediumDecreaseItemMeta);
@@ -929,10 +934,10 @@ public class Menu implements CommandExecutor {
             ItemMeta largeDecreaseItemMeta = largeDecreaseItem.getItemMeta();
 
             //Change the object name.
-            largeDecreaseItemMeta.displayName(MessageHandler.getMessageAsComponent("LargeDecreaseItemName"));
+            largeDecreaseItemMeta.displayName(messageHandler.getMessageAsComponent("LargeDecreaseItemName"));
 
             //Change the object lore.
-            largeDecreaseItemMeta.lore(MessageHandler.getMessagesAsComponentList("LargeDecreaseItemLore"));
+            largeDecreaseItemMeta.lore(messageHandler.getMessagesAsComponentList("LargeDecreaseItemLore"));
 
             //Assemble metadata back to item.
             largeDecreaseItem.setItemMeta(largeDecreaseItemMeta);
@@ -946,10 +951,10 @@ public class Menu implements CommandExecutor {
             ItemMeta backItemMeta = backItem.getItemMeta();
 
             //Change the object name.
-            backItemMeta.displayName(MessageHandler.getMessageAsComponent("BackItemName"));
+            backItemMeta.displayName(messageHandler.getMessageAsComponent("BackItemName"));
 
             //Change the object lore.
-            backItemMeta.lore(MessageHandler.getMessagesAsComponentList("BackItemLore"));
+            backItemMeta.lore(messageHandler.getMessagesAsComponentList("BackItemLore"));
 
             //Assemble metadata back to item.
             backItem.setItemMeta(backItemMeta);
@@ -995,7 +1000,7 @@ public class Menu implements CommandExecutor {
             //SQL Statements to get necessary information.
             int timerVal = 0;
             try {
-                ResultSet areaTimer = DatabaseHandler.getAreaTimer(uuid);
+                ResultSet areaTimer = databaseHandler.getAreaTimer(uuid);
                 timerVal = areaTimer.getInt("timerValue");
                 areaTimer.close();
             } catch (SQLException se) {
@@ -1004,7 +1009,7 @@ public class Menu implements CommandExecutor {
 
 
             //Change the object lore.
-            List<Component> displayTimerItemLoreList = MessageHandler.getMessagesAsComponentList("DisplayTimerItemLore");
+            List<Component> displayTimerItemLoreList = messageHandler.getMessagesAsComponentList("DisplayTimerItemLore");
             int hours = timerVal / 3600;
             int minutes = (timerVal % 3600) / 60;
             int seconds = timerVal % 60;
@@ -1024,7 +1029,7 @@ public class Menu implements CommandExecutor {
      * -> Listens to events from TimerMenu objects.
      * @author lgndluke
      **/
-    public static class TimerMenuListener implements Listener {
+    public class TimerMenuListener implements Listener {
 
         //Attributes
         private TimerMenu timerMenu;
@@ -1042,13 +1047,13 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(timerMenu.getSmallIncreaseItem().equals(event.getCurrentItem())) {
                         try {
-                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
-                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            ResultSet areaData = databaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                             int currTimerVal = areaTimer.getInt("timerValue");
-                            int smallIncVal = (int) ConfigHandler.get("SmallIncreaseValue");
+                            int smallIncVal = (int) configHandler.get("SmallIncreaseValue");
                             int updateVal = currTimerVal+smallIncVal;
-                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
-                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            databaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            autoResetHandler.updateAreaResetInterval(itemName, updateVal);
                             this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
                             areaData.close();
                             areaTimer.close();
@@ -1062,13 +1067,13 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(timerMenu.getMediumIncreaseItem().equals(event.getCurrentItem())) {
                         try {
-                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
-                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            ResultSet areaData = databaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                             int currTimerVal = areaTimer.getInt("timerValue");
-                            int mediumIncVal = (int) ConfigHandler.get("MediumIncreaseValue");
+                            int mediumIncVal = (int) configHandler.get("MediumIncreaseValue");
                             int updateVal = currTimerVal+mediumIncVal;
-                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
-                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            databaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            autoResetHandler.updateAreaResetInterval(itemName, updateVal);
                             this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
                             areaData.close();
                             areaTimer.close();
@@ -1082,13 +1087,13 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(timerMenu.getLargeIncreaseItem().equals(event.getCurrentItem())) {
                         try {
-                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
-                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            ResultSet areaData = databaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                             int currTimerVal = areaTimer.getInt("timerValue");
-                            int largeIncVal = (int) ConfigHandler.get("LargeIncreaseValue");
+                            int largeIncVal = (int) configHandler.get("LargeIncreaseValue");
                             int updateVal = currTimerVal+largeIncVal;
-                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
-                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            databaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            autoResetHandler.updateAreaResetInterval(itemName, updateVal);
                             this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
                             areaData.close();
                             areaTimer.close();
@@ -1102,13 +1107,13 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(timerMenu.getSmallDecreaseItem().equals(event.getCurrentItem())) {
                         try {
-                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
-                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            ResultSet areaData = databaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                             int currTimerVal = areaTimer.getInt("timerValue");
-                            int smallDecVal = (int) ConfigHandler.get("SmallDecreaseValue");
+                            int smallDecVal = (int) configHandler.get("SmallDecreaseValue");
                             int updateVal = currTimerVal-smallDecVal;
-                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
-                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            databaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            autoResetHandler.updateAreaResetInterval(itemName, updateVal);
                             this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
                             areaData.close();
                             areaTimer.close();
@@ -1122,13 +1127,13 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(timerMenu.getMediumDecreaseItem().equals(event.getCurrentItem())) {
                         try {
-                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
-                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            ResultSet areaData = databaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                             int currTimerVal = areaTimer.getInt("timerValue");
-                            int mediumDecVal = (int) ConfigHandler.get("MediumDecreaseValue");
+                            int mediumDecVal = (int) configHandler.get("MediumDecreaseValue");
                             int updateVal = currTimerVal-mediumDecVal;
-                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
-                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            databaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            autoResetHandler.updateAreaResetInterval(itemName, updateVal);
                             this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
                             areaData.close();
                             areaTimer.close();
@@ -1142,13 +1147,13 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(timerMenu.getLargeDecreaseItem().equals(event.getCurrentItem())) {
                         try {
-                            ResultSet areaData = DatabaseHandler.getAreaData(itemName);
-                            ResultSet areaTimer = DatabaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                            ResultSet areaData = databaseHandler.getAreaData(itemName);
+                            ResultSet areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                             int currTimerVal = areaTimer.getInt("timerValue");
-                            int largeDecVal = (int) ConfigHandler.get("LargeDecreaseValue");
+                            int largeDecVal = (int) configHandler.get("LargeDecreaseValue");
                             int updateVal = currTimerVal-largeDecVal;
-                            DatabaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
-                            AutoResetHandler.updateAreaResetInterval(itemName, updateVal);
+                            databaseHandler.updateAreaTimerTimerValue(UUID.fromString(areaData.getString("uuid")), updateVal);
+                            autoResetHandler.updateAreaResetInterval(itemName, updateVal);
                             this.timerMenu.updateDisplayItem(UUID.fromString(areaData.getString("uuid")));
                             areaData.close();
                             areaTimer.close();
@@ -1162,8 +1167,8 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(timerMenu.getBackItem().equals(event.getCurrentItem())) {
                         SettingsMenu settings = new SettingsMenu(itemName);
-                        ListenerLoader.getSettingsInvListener().setSettingsMenu(settings);
-                        ListenerLoader.getSettingsInvListener().setItemName(itemName);
+                        listenerLoader.getSettingsInvListener().setSettingsMenu(settings);
+                        listenerLoader.getSettingsInvListener().setItemName(itemName);
                         player.openInventory(settings.getInv());
                     }
                     //-----------------------------------------------------------
