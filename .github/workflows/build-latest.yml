@@ -62,18 +62,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Download lgndware JAR
+      - name: Download lgndware.
         run: |
           curl -L -o lgndware-1.0.0.jar -H "Authorization: token ${{ secrets.LGNDWARE_ACCESS_TOKEN }}" \
           https://github.com/lgndluke/lgndware/releases/download/lgndware-1.0.0-Dev/lgndware-1.0.0.jar
 
-      - name: Install maven dependencies and add lgndware JAR to local Maven repository
+      - name: Install dependencies and build project.
         run: |
-          mvn install
           mvn install:install-file -Dfile=lgndware-1.0.0.jar -DgroupId=com.lgndluke -DartifactId=lgndware -Dversion=1.0.0 -Dpackaging=jar
-
-      - name: Build project.
-        run: mvn -B package --file pom.xml
+          mvn install
+          mvn -B package --file pom.xml
 
       - name: Create release directory and move .jar into it.
         run: |
