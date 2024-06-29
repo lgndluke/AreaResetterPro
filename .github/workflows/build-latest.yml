@@ -67,11 +67,10 @@ jobs:
           curl -L -o lgndware-1.0.0.jar -H "Authorization: token ${{ secrets.LGNDWARE_ACCESS_TOKEN }}" \
           https://github.com/lgndluke/lgndware/releases/download/lgndware-1.0.0-Dev/lgndware-1.0.0.jar
 
-      - name: Install lgndware JAR into local Maven repository
-        run: mvn install:install-file -Dfile=lgndware-1.0.0.jar -DgroupId=com.lgndluke -DartifactId=lgndware -Dversion=1.0.0 -Dpackaging=jar
-
-      - name: Install dependencies.
-        run: mvn install
+      - name: Install maven dependencies and add lgndware JAR to local Maven repository
+        run: |
+          mvn install
+          mvn install:install-file -Dfile=lgndware-1.0.0.jar -DgroupId=com.lgndluke -DartifactId=lgndware -Dversion=1.0.0 -Dpackaging=jar
 
       - name: Build project.
         run: mvn -B package --file pom.xml
