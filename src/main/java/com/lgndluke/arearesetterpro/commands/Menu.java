@@ -39,12 +39,11 @@ public class Menu implements CommandExecutor {
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler();
-    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
-    private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
-    private final ListenerLoader listenerLoader = AreaResetterPro.getPlugin(AreaResetterPro.class).getListenerLoader();
-    private final AutoResetHandler autoResetHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getAutoResetHandler();
-    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private static final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler();
+    private static final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private static final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
+    private static final AutoResetHandler autoResetHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getAutoResetHandler();
+    private static final Component prefix = messageHandler.getMessageAsComponent("Prefix");
     private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
     private final String executedByConsole = messageHandler.getMessageAsString("ExecutedByConsole");
 
@@ -68,7 +67,7 @@ public class Menu implements CommandExecutor {
     /**
      * Method that provides Inventory objects with empty item objects.
      **/
-    private ItemStack getEmptyItem() {
+    private static ItemStack getEmptyItem() {
         ItemStack emptyItem = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1);
         //-----------------------------------------------------------
         //Initialize emptyItem.
@@ -98,7 +97,7 @@ public class Menu implements CommandExecutor {
      * -> Represents the graphical in-game menu of the Plugin.
      * @author lgndluke
      **/
-    private class AreaInventory {
+    private static class AreaInventory {
 
         //Attributes
         private final List<ItemStack> contents = new ArrayList<>();
@@ -214,7 +213,7 @@ public class Menu implements CommandExecutor {
 
             //-----------------------------------------------------------
             //Make the registered listener to listen to this inventory.
-            listenerLoader.getAreaInvListener().setMainInv(this);
+            ListenerLoader.getAreaInvListener().setMainInv(this);
             //-----------------------------------------------------------
 
             //-----------------------------------------------------------------------------------------------------
@@ -279,7 +278,7 @@ public class Menu implements CommandExecutor {
      * -> Listens to events from the GuiInventory.
      * @author lgndluke
      **/
-    public class AreaInvListener implements Listener {
+    public static class AreaInvListener implements Listener {
 
         //Attributes
         private final Component noPrevPage = messageHandler.getMessageAsComponent("NoPreviousPage");
@@ -305,13 +304,13 @@ public class Menu implements CommandExecutor {
                         String itemName = edgedNameString.substring(1, edgedNameString.length()-1);
                         if(event.getClick().isLeftClick()) {
                             SettingsMenu settings = new SettingsMenu(itemName);
-                            listenerLoader.getSettingsInvListener().setSettingsMenu(settings);
-                            listenerLoader.getSettingsInvListener().setItemName(itemName);
+                            ListenerLoader.getSettingsInvListener().setSettingsMenu(settings);
+                            ListenerLoader.getSettingsInvListener().setItemName(itemName);
                             player.openInventory(settings.getInv());
                         } else if (event.getClick().isRightClick()) {
                             ConfirmationMenu confirmation = new ConfirmationMenu();
-                            listenerLoader.getConfirmationInvListener().setConfirmationMenu(confirmation);
-                            listenerLoader.getConfirmationInvListener().setItemName(itemName);
+                            ListenerLoader.getConfirmationInvListener().setConfirmationMenu(confirmation);
+                            ListenerLoader.getConfirmationInvListener().setItemName(itemName);
                             player.openInventory(confirmation.getInv());
                         }
                     }
@@ -373,7 +372,7 @@ public class Menu implements CommandExecutor {
      * -> Represents the graphical in-game menu to accept the removal of an area.
      * @author lgndluke
      **/
-    private class ConfirmationMenu {
+    private static class ConfirmationMenu {
 
         //Attributes
         private final ItemStack confirmationItem;
@@ -443,7 +442,7 @@ public class Menu implements CommandExecutor {
      * -> Listens to events from the ConfirmationMenu.
      * @author lgndluke
      **/
-    public class ConfirmationMenuListener implements Listener {
+    public static class ConfirmationMenuListener implements Listener {
 
         //Attributes
         private ConfirmationMenu confirmationMenu;
@@ -462,7 +461,7 @@ public class Menu implements CommandExecutor {
                     if(confirmationMenu.getConfirmationItem().equals(event.getCurrentItem())) {
                         areaPlugin.getServer().getScheduler().runTaskAsynchronously(areaPlugin, new Remove.Remover(player, itemName));
                         AreaInventory areaInv = new AreaInventory();
-                        player.openInventory(areaInv.getInvPage(listenerLoader.getAreaInvListener().getIndex()));
+                        player.openInventory(areaInv.getInvPage(ListenerLoader.getAreaInvListener().getIndex()));
                     }
                     //-----------------------------------------------------------
 
@@ -470,7 +469,7 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(confirmationMenu.getCancelItem().equals(event.getCurrentItem())) {
                         AreaInventory areaInv = new AreaInventory();
-                        player.openInventory(areaInv.getInvPage(listenerLoader.getAreaInvListener().getIndex()));
+                        player.openInventory(areaInv.getInvPage(ListenerLoader.getAreaInvListener().getIndex()));
                     }
                     //-----------------------------------------------------------
                     event.setCancelled(true);
@@ -495,7 +494,7 @@ public class Menu implements CommandExecutor {
      * -> Represents the graphical in-game menu to edit an Area objects properties.
      * @author lgndluke
      **/
-    private class SettingsMenu {
+    private static class SettingsMenu {
 
         //Attributes
         private final ItemStack instantResetItem;
@@ -709,7 +708,7 @@ public class Menu implements CommandExecutor {
      * -> Listens to events from SettingsMenu objects.
      * @author lgndluke
      **/
-    public class SettingsMenuListener implements Listener {
+    public static class SettingsMenuListener implements Listener {
 
         //Attributes
         private SettingsMenu settingsMenu;
@@ -734,8 +733,8 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(settingsMenu.getTimerItem().equals(event.getCurrentItem())) {
                         TimerMenu timerMenu = new TimerMenu(itemName);
-                        listenerLoader.getTimerListener().setTimerMenu(timerMenu);
-                        listenerLoader.getTimerListener().setItemName(itemName);
+                        ListenerLoader.getTimerListener().setTimerMenu(timerMenu);
+                        ListenerLoader.getTimerListener().setItemName(itemName);
                         player.openInventory(timerMenu.getInv());
                     }
                     //-----------------------------------------------------------
@@ -765,7 +764,7 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(settingsMenu.getBackItem().equals(event.getCurrentItem())) {
                         AreaInventory areaInv = new AreaInventory();
-                        player.openInventory(areaInv.getInvPage(listenerLoader.getAreaInvListener().getIndex()));
+                        player.openInventory(areaInv.getInvPage(ListenerLoader.getAreaInvListener().getIndex()));
                     }
                     //-----------------------------------------------------------
                     event.setCancelled(true);
@@ -791,7 +790,7 @@ public class Menu implements CommandExecutor {
      * -> Represents the graphical in-game menu to edit an Area objects reset timer.
      * @author lgndluke
      **/
-    private class TimerMenu {
+    private static class TimerMenu {
 
         //Attributes
         private final ItemStack smallIncreaseItem;
@@ -1029,7 +1028,7 @@ public class Menu implements CommandExecutor {
      * -> Listens to events from TimerMenu objects.
      * @author lgndluke
      **/
-    public class TimerMenuListener implements Listener {
+    public static class TimerMenuListener implements Listener {
 
         //Attributes
         private TimerMenu timerMenu;
@@ -1167,8 +1166,8 @@ public class Menu implements CommandExecutor {
                     //-----------------------------------------------------------
                     if(timerMenu.getBackItem().equals(event.getCurrentItem())) {
                         SettingsMenu settings = new SettingsMenu(itemName);
-                        listenerLoader.getSettingsInvListener().setSettingsMenu(settings);
-                        listenerLoader.getSettingsInvListener().setItemName(itemName);
+                        ListenerLoader.getSettingsInvListener().setSettingsMenu(settings);
+                        ListenerLoader.getSettingsInvListener().setItemName(itemName);
                         player.openInventory(settings.getInv());
                     }
                     //-----------------------------------------------------------

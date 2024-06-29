@@ -31,7 +31,6 @@ public class Reload implements CommandExecutor {
     private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
     private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
     private final Component reloadMsg = messageHandler.getMessageAsComponent("ReloadConfigsMessage");
-    private final Component reloadFailedMsg = messageHandler.getMessageAsComponent("ReloadConfigsFailedMessage");
     private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
 
     //CommandExecutor

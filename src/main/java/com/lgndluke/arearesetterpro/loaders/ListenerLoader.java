@@ -11,11 +11,11 @@ import org.bukkit.plugin.java.JavaPlugin;
  **/
 public class ListenerLoader extends AbstractListenerLoader {
 
-    private Menu.AreaInvListener invListener;
-    private Menu.ConfirmationMenuListener confirmationListener;
-    private Menu.SettingsMenuListener settingsListener;
-    private Menu.TimerMenuListener timerListener;
-    private Tool.SetPosToolListener toolListener;
+    private static final Menu.AreaInvListener invListener = new Menu.AreaInvListener();
+    private static final Menu.ConfirmationMenuListener confirmationListener = new Menu.ConfirmationMenuListener();
+    private static final Menu.SettingsMenuListener settingsListener = new Menu.SettingsMenuListener();
+    private static final Menu.TimerMenuListener timerListener = new Menu.TimerMenuListener();
+    private static final Tool.SetPosToolListener toolListener = new Tool.SetPosToolListener();
 
     public ListenerLoader(JavaPlugin plugin) {
         super(plugin);
@@ -32,16 +32,16 @@ public class ListenerLoader extends AbstractListenerLoader {
 
     }
 
-    public Menu.AreaInvListener getAreaInvListener() {
+    public static Menu.AreaInvListener getAreaInvListener() {
         return invListener;
     }
-    public Menu.ConfirmationMenuListener getConfirmationInvListener() {
+    public static Menu.ConfirmationMenuListener getConfirmationInvListener() {
         return confirmationListener;
     }
-    public Menu.SettingsMenuListener getSettingsInvListener() {
+    public static Menu.SettingsMenuListener getSettingsInvListener() {
         return settingsListener;
     }
-    public Menu.TimerMenuListener getTimerListener()  {
+    public static Menu.TimerMenuListener getTimerListener()  {
         return timerListener;
     }
 

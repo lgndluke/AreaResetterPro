@@ -1,7 +1,6 @@
 package com.lgndluke.arearesetterpro.commands;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.data.PositionsHandler;
 import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
 import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
@@ -51,7 +50,6 @@ public class GetSpawnPoint implements CommandExecutor {
     private static class GetPosThread implements Runnable {
 
         //Attributes
-        private final PositionsHandler positionsHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getPositionsHandler();
         private final SpawnPointHandler spawnPointHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getSpawnPointHandler();
         private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
         private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
@@ -75,7 +73,7 @@ public class GetSpawnPoint implements CommandExecutor {
 
                 sender.sendMessage(prefix.append(spawn));
 
-            } else if(positionsHandler.getPosition(PositionsHandler.Position.POS1) == null) {
+            } else if(spawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT) == null) {
                 sender.sendMessage(prefix.append(noSpawn));
             }
 

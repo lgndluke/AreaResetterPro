@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -35,47 +36,49 @@ public class AutoResetHandler extends AbstractHandler {
     private final Plugin areaPlugin = super.getPlugin();
     private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
     private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
-    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
-    private final Component resetMsgPlayer = messageHandler.getMessageAsComponent("ResetMessagePlayer");
     private static final List<AutoResetter> autoResetterList = new ArrayList<>();
 
     public AutoResetHandler(JavaPlugin plugin) {
         super(plugin);
     }
 
-    //Static Methods
-    /**
-     * Initialization inside DatabaseHandler!
-     * Otherwise, DbCon might not be ready when this is trying to init.
-     **/
     @Override
-    public void initialize() {
-        //Start auto-resetter for every area.
-        ResultSet areaData = databaseHandler.getAreaData();
-        ResultSet areaTimer = null;
-        try {
-            if(areaData != null) {
-                while (areaData.next()) {
-                    areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
-                    addNewAutoResetter(areaData.getString("areaName"),
-                                       areaTimer.getLong("timerValue"));
+    public boolean initialize() {
+        FutureTask<Boolean> initAutoResetHandler = new FutureTask<>(() -> {
+            //Start auto-resetter for every area.
+            ResultSet areaData = databaseHandler.getAreaData();
+            ResultSet areaTimer = null;
+            try {
+                if(areaData != null) {
+                    while (areaData.next()) {
+                        areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
+                        addNewAutoResetter(areaData.getString("areaName"),
+                                areaTimer.getLong("timerValue"));
+                    }
+                    areaData.close();
                 }
-                areaData.close();
+                if(areaTimer != null) {
+                    areaTimer.close();
+                }
+            } catch(NumberFormatException nfe) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Failed to enable auto-resetter", nfe);
+                return false;
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                return false;
             }
-            if(areaTimer != null) {
-                areaTimer.close();
-            }
-        } catch(NumberFormatException nfe) {
-            super.getPlugin().getLogger().log(Level.SEVERE, "Failed to enable auto-resetter", nfe);
-        } catch (SQLException se) {
-            super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
-        }
-
+            return true;
+        });
+        return super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), initAutoResetHandler, 10, TimeUnit.SECONDS);
     }
 
     @Override
-    public void terminate() {
-        super.getAsyncExecutor().shutdown();
+    public boolean terminate() {
+        if(!super.getAsyncExecutor().isShutdown()) {
+            super.getAsyncExecutor().shutdown();
+            return true;
+        }
+        return false;
     }
 
     public void addNewAutoResetter(String areaName, long resetInterval) {
@@ -112,6 +115,8 @@ public class AutoResetHandler extends AbstractHandler {
     private class AutoResetter implements Runnable {
 
         //Attributes
+        private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+        private final Component resetMsgPlayer = messageHandler.getMessageAsComponent("ResetMessagePlayer");
         private final String areaName;
         private long resetInterval;
         private long timeRemaining;
@@ -127,7 +132,7 @@ public class AutoResetHandler extends AbstractHandler {
 
         //Runnable
         @Override
-        public void run() {
+        public void run() { //TODO RE_WRITE PROCESS! -> Only resets/reloads timer on autoreset -> not on instant reset -> annoying!
 
             try {
 

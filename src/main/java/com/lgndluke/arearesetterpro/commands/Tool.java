@@ -57,7 +57,7 @@ public class Tool implements CommandExecutor {
      * This class represents the SetPosTool as ItemStack object.
      * @author lgndluke
      **/
-    private class SetPosTool {
+    private static class SetPosTool {
 
         //Static Attributes
         private static final NamespacedKey setPosToolKey = new NamespacedKey(areaPlugin, "AreaResetterPro_PosTool");
@@ -112,7 +112,7 @@ public class Tool implements CommandExecutor {
      * -> Listens to events from the SetPosTool.
      * @author lgndluke
      **/
-    public class SetPosToolListener implements Listener {
+    public static class SetPosToolListener implements Listener {
 
         //Listener
         @EventHandler
@@ -162,7 +162,6 @@ public class Tool implements CommandExecutor {
         private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
         private final Component setPos1 = messageHandler.getMessageAsComponent("SetPos1Message");
         private final Component setPos2 = messageHandler.getMessageAsComponent("SetPos2Message");
-        private final Component setPosFailed = messageHandler.getMessageAsComponent("SetPosFailed");
         private final Player player;
         private final PositionsHandler.Position pos;
         private final Location location;

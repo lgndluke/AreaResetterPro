@@ -82,7 +82,7 @@ public class Remove implements CommandExecutor {
         @Override
         public void run() {
 
-            try {
+            try { //TODO RE_WRITE!
                 ResultSet results = databaseHandler.getAreaData();
                 while(results.next()) {
                     if (results.getString("areaName").equals(this.areaName)) {
@@ -91,12 +91,14 @@ public class Remove implements CommandExecutor {
                         databaseHandler.deleteAreaStats(uuid);
                         databaseHandler.deleteAreaTimer(uuid);
 
-                        String filePath = "AreaData/" + uuid + ".schem";
+                        String filePath = "/AreaData/" + uuid + ".schem";
                         File worldData = new File(areaPlugin.getDataFolder().getAbsolutePath(), filePath);
                         boolean worldDataDeleted = worldData.delete();
                         if (worldDataDeleted) {
                             this.player.sendMessage(prefix.append(this.success));
                         } else {
+                            areaPlugin.getLogger().log(Level.SEVERE, "Deletion of world data in file " + worldData.getAbsoluteFile() + "failed.");
+                            areaPlugin.getLogger().log(Level.SEVERE, "Please manually delete this file!");
                             this.player.sendMessage(prefix.append(this.failed));
                         }
                         return;

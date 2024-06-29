@@ -31,16 +31,16 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
     }
 
     @Override
-    public void initialize() {
-        FutureTask<Void> initAbstractDatabaseHandler = new FutureTask<>(() -> {
+    public boolean initialize() {
+        FutureTask<Boolean> initDatabaseHandler = new FutureTask<>(() -> {
             createDatabase();
             connect();
             createTables();
             //Enable PlaceholderAPI expansion.
             AreaResetterProExpansion.updateValues();
-            return null;
+            return true;
         });
-        super.getAsyncExecutor().execute(initAbstractDatabaseHandler);
+        return super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), initDatabaseHandler, 10, TimeUnit.SECONDS);
     }
 
     public ResultSet getAreaData() {
@@ -71,7 +71,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
     }
 
     public void insertAreaData(UUID uuid, String areaName, String worldName, Location pos1, Location pos2, Location spawn) {
-        FutureTask<Void> insertAreaDataTask = new FutureTask<>(() -> {
+        FutureTask<Boolean> insertAreaDataTask = new FutureTask<>(() -> {
             try {
                 PreparedStatement prepState = super.getDbCon().prepareStatement("INSERT INTO AreaData " +
                         "(uuid, areaName, world, xValPos1, yValPos1, zValPos1, xValPos2, yValPos2, zValPos2, xValSpawn, yValSpawn, zValSpawn)" +
@@ -96,13 +96,13 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             } catch (SQLException se) {
                 super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't insert AreaData!", se);
             }
-            return null;
+            return true;
         });
-        super.getAsyncExecutor().execute(insertAreaDataTask);
+        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), insertAreaDataTask, 10, TimeUnit.SECONDS);
     }
 
     public void deleteAreaData(String areaName) {
-        FutureTask<Void> deleteAreaDataTask = new FutureTask<>(() -> {
+        FutureTask<Boolean> deleteAreaDataTask = new FutureTask<>(() -> {
             try {
                 PreparedStatement prepState = super.getDbCon().prepareStatement("DELETE FROM AreaData WHERE areaName = ?;");
                 prepState.setString(1, areaName);
@@ -111,9 +111,9 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             } catch (SQLException se) {
                 super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't delete AreaData!", se);
             }
-            return null;
+            return true;
         });
-        super.getAsyncExecutor().execute(deleteAreaDataTask);
+        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaDataTask, 10, TimeUnit.SECONDS);
     }
 
     public ResultSet getAreaStats(UUID uuid) {
@@ -132,7 +132,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
 
     public void insertAreaStats(UUID uuid, long overallBlocks) {
         final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler(); //TODO FIX!
-        FutureTask<Void> insertAreaStatsTask = new FutureTask<>(() -> {
+        FutureTask<Boolean> insertAreaStatsTask = new FutureTask<>(() -> {
             try {
                 PreparedStatement prepState = super.getDbCon().prepareStatement("INSERT INTO AreaStats (uuid, timesReset, overallBlocks, entitiesSaved, createdOn) VALUES (?, 0, ?, ?, ?);");
                 prepState.setString(1, uuid.toString());
@@ -144,13 +144,13 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             } catch (SQLException se) {
                 super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't insert AreaStats!", se);
             }
-            return null;
+            return true;
         });
-        super.getAsyncExecutor().execute(insertAreaStatsTask);
+        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), insertAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
     public void updateAreaStatsTimesReset(UUID uuid, int timesReset) {
-        FutureTask<Void> updateAreaStatsTask = new FutureTask<>(() -> {
+        FutureTask<Boolean> updateAreaStatsTask = new FutureTask<>(() -> {
             try {
                 PreparedStatement prepState = super.getDbCon().prepareStatement("UPDATE AreaStats SET timesReset = ? WHERE uuid = ?;");
                 prepState.setInt(1, Math.addExact(timesReset, 1));
@@ -160,13 +160,13 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             } catch (SQLException se) {
                 super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't update AreaStats 'timesReset'!", se);
             }
-            return null;
+            return true;
         });
-        super.getAsyncExecutor().execute(updateAreaStatsTask);
+        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), updateAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
     public void deleteAreaStats(UUID uuid) {
-        FutureTask<Void> deleteAreaStatsTask = new FutureTask<>(() -> {
+        FutureTask<Boolean> deleteAreaStatsTask = new FutureTask<>(() -> {
             try {
                 PreparedStatement prepState = super.getDbCon().prepareStatement("DELETE FROM AreaStats WHERE uuid = ?;");
                 prepState.setObject(1, uuid);
@@ -175,9 +175,9 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             } catch (SQLException se) {
                 super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't delete AreaStats", se);
             }
-            return null;
+            return true;
         });
-        super.getAsyncExecutor().execute(deleteAreaStatsTask);
+        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
     public ResultSet getAreaTimer(UUID uuid) {
@@ -195,7 +195,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
     }
 
     public void insertAreaTimer(UUID uuid, int configTimerValue) {
-        FutureTask<Void> insertAreaTimerTask = new FutureTask<>(() -> {
+        FutureTask<Boolean> insertAreaTimerTask = new FutureTask<>(() -> {
             try {
                 PreparedStatement prepState = super.getDbCon().prepareStatement("INSERT INTO AreaTimer (uuid, timerValue) VALUES (?, ?);");
                 prepState.setString(1, uuid.toString());
@@ -205,13 +205,13 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             } catch (SQLException se) {
                 super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't insert AreaTimer!", se);
             }
-            return null;
+            return true;
         });
-        super.getAsyncExecutor().execute(insertAreaTimerTask);
+        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), insertAreaTimerTask, 10, TimeUnit.SECONDS);
     }
 
     public void updateAreaTimerTimerValue(UUID uuid, int timerValue) {
-        FutureTask<Void> updateAreaTimerTask = new FutureTask<>(() -> {
+        FutureTask<Boolean> updateAreaTimerTask = new FutureTask<>(() -> {
             try {
                 PreparedStatement prepState = super.getDbCon().prepareStatement("UPDATE AreaTimer SET timerValue = ? WHERE uuid = ?;");
                 prepState.setInt(1, Math.max(timerValue, 1));
@@ -221,13 +221,13 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             } catch (SQLException se) {
                 super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't update AreaTimer 'timerValue'!", se);
             }
-            return null;
+            return true;
         });
-        super.getAsyncExecutor().execute(updateAreaTimerTask);
+        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), updateAreaTimerTask, 10, TimeUnit.SECONDS);
     }
 
     public void deleteAreaTimer(UUID uuid) {
-        FutureTask<Void> deleteAreaStatsTask = new FutureTask<>(() -> {
+        FutureTask<Boolean> deleteAreaStatsTask = new FutureTask<>(() -> {
             try {
                 PreparedStatement prepState = super.getDbCon().prepareStatement("DELETE FROM AreaTimer WHERE uuid = ?;");
                 prepState.setObject(1, uuid);
@@ -236,9 +236,9 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             } catch (SQLException se) {
                 super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't delete AreaTimer!", se);
             }
-            return null;
+            return true;
         });
-        super.getAsyncExecutor().execute(deleteAreaStatsTask);
+        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
     @Override
@@ -317,6 +317,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             dbStatement.execute(sqlStats);
             dbStatement.execute(sqlTimer);
             dbStatement.close();
+            super.getPlugin().getLogger().log(Level.INFO, "Successfully initialized Database tables!");
         } catch (SQLException se) {
             super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't create Database-Tables!", se);
         }
