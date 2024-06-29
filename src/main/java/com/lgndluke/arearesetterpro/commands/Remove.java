@@ -97,8 +97,10 @@ public class Remove implements CommandExecutor {
                         if (worldDataDeleted) {
                             this.player.sendMessage(prefix.append(this.success));
                         } else {
-                            areaPlugin.getLogger().log(Level.SEVERE, "Deletion of world data in file " + worldData.getAbsoluteFile() + "failed.");
-                            areaPlugin.getLogger().log(Level.SEVERE, "Please manually delete this file!");
+                            areaPlugin.getLogger().log(Level.SEVERE, "Deletion of world data located at: " + worldData.getAbsoluteFile() + " failed.\n" +
+                                                                          "Please manually delete this file to free up the occupied disk space!\n" +
+                                                                          "This ISSUE does not affect AreaResetterPro's operationality!" +
+                                                                          "The ISSUE is known and will be fixed in an upcoming version.");
                             this.player.sendMessage(prefix.append(this.failed));
                         }
                         return;
