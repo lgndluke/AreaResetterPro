@@ -82,7 +82,7 @@ public class Remove implements CommandExecutor {
         @Override
         public void run() {
 
-            try { //TODO RE_WRITE!
+            try { //TODO RE_WRITE! -> Only bugs once an area was reset!
                 ResultSet results = databaseHandler.getAreaData();
                 while(results.next()) {
                     if (results.getString("areaName").equals(this.areaName)) {
@@ -97,10 +97,10 @@ public class Remove implements CommandExecutor {
                         if (worldDataDeleted) {
                             this.player.sendMessage(prefix.append(this.success));
                         } else {
-                            areaPlugin.getLogger().log(Level.SEVERE, "Deletion of world data located at: " + worldData.getAbsoluteFile() + " failed.\n" +
-                                                                          "Please manually delete this file to free up the occupied disk space!\n" +
-                                                                          "This ISSUE does not affect AreaResetterPro's operationality!\n" +
-                                                                          "The ISSUE is known and will be fixed in an upcoming version.");
+                            areaPlugin.getLogger().log(Level.SEVERE, "Deletion of world data located at: " + worldData.getAbsoluteFile() + " failed.");
+                            areaPlugin.getLogger().log(Level.SEVERE, "Please manually delete this file to free up the occupied disk space!");
+                            areaPlugin.getLogger().log(Level.SEVERE, "This ISSUE does not affect AreaResetterPro's operationality!");
+                            areaPlugin.getLogger().log(Level.SEVERE, "The ISSUE is known and will be fixed in an upcoming version.");
                             this.player.sendMessage(prefix.append(this.failed));
                         }
                         return;
