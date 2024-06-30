@@ -166,17 +166,18 @@ public class AutoResetHandler extends AbstractHandler {
                         String filePath = "AreaData/" + uuid + ".schem";
                         File worldData = new File(areaPlugin.getDataFolder().getAbsolutePath(), filePath);
 
-                        Bukkit.getScheduler().runTask(areaPlugin, () -> {
-                            List<Player> activePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
-                            for(Player player : activePlayers) {
-                                if(isInsideArea(player, new Location(WorldCreator.name(worldName).createWorld(), xVal1, yVal1, zVal1),
-                                        new Location(WorldCreator.name(worldName).createWorld(), xVal2, yVal2, zVal2)))
-                                {
-                                    player.sendMessage(prefix.append(resetMsgPlayer));
-                                    player.teleportAsync(new Location(WorldCreator.name(worldName).createWorld(), xValSpawn, yValSpawn, zValSpawn));
+                        if(xVal1 != xValSpawn && yVal1 != yValSpawn && zVal1 != zValSpawn) {
+                            Bukkit.getScheduler().runTask(areaPlugin, () -> {
+                                List<Player> activePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
+                                for (Player player : activePlayers) {
+                                    if (isInsideArea(player, new Location(WorldCreator.name(worldName).createWorld(), xVal1, yVal1, zVal1),
+                                            new Location(WorldCreator.name(worldName).createWorld(), xVal2, yVal2, zVal2))) {
+                                        player.sendMessage(prefix.append(resetMsgPlayer));
+                                        player.teleportAsync(new Location(WorldCreator.name(worldName).createWorld(), xValSpawn, yValSpawn, zValSpawn));
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
 
                         FaweAPI.load(worldData).paste(FaweAPI.getWorld(worldName), BlockVector3.at(Math.min(xVal1, xVal2), Math.min(yVal1, yVal2), Math.min(zVal1, zVal2)));
                         databaseHandler.updateAreaStatsTimesReset(uuid, timesReset);

@@ -3,7 +3,7 @@ name: build-latest
 on:
   push:
     branches:
-      - master
+      - development
 
 jobs:
   analyze:
@@ -80,7 +80,7 @@ jobs:
       - name: Upload .jar file as an artifact.
         uses: actions/upload-artifact@v4
         with:
-          name: AreaResetterPro-latest
+          name: AreaResetterPro-Dev
           path: release/*.jar
 
   deploy:
@@ -94,7 +94,7 @@ jobs:
       - name: Download .jar artifact.
         uses: actions/download-artifact@v4
         with:
-          name: AreaResetterPro-latest
+          name: AreaResetterPro-Dev
           path: release
 
       - name: Get .jar file name
@@ -113,8 +113,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
-          tag_name: ${{ env.JAR_BASENAME }}-v${{ GITHUB.RUN_NUMBER }}
-          release_name: ${{ env.JAR_BASENAME }}-v${{ GITHUB.RUN_NUMBER }}
+          tag_name: ${{ env.JAR_BASENAME }}-Dev
+          release_name: ${{ env.JAR_BASENAME }}-Dev
           draft: false
           prerelease: false
 
