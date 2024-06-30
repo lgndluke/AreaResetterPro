@@ -66,9 +66,9 @@ jobs:
         run: |
           curl -L -o lgndware-1.0.0.jar -H "Authorization: token ${{ secrets.LGNDWARE_ACCESS_TOKEN }}" \
           https://github.com/lgndluke/lgndware/releases/download/lgndware-1.0.0-Dev/lgndware-1.0.0.jar
-          curl -L -o lgndware-source.zip -H "Authorization: token ${{ secrets.LGNDWARE_ACCESS_TOKEN }}" \
+          curl -L -o lgndware-1.0.0-Dev.zip -H "Authorization: token ${{ secrets.LGNDWARE_ACCESS_TOKEN }}" \
           https://github.com/lgndluke/lgndware/archive/refs/tags/lgndware-1.0.0-Dev.zip
-          unzip lgndware-source.zip
+          unzip lgndware-1.0.0-Dev.zip
           mv lgndware-1.0.0.jar lgndware-lgndware-1.0.0-Dev
           cd lgndware-lgndware-1.0.0-Dev
 
