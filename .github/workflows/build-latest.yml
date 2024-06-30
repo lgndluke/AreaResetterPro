@@ -64,12 +64,8 @@ jobs:
 
       - name: Download and unzip lgndware.
         run: |
-          curl -L -o lgndware-1.0.0.jar -H "Authorization: token ${{ secrets.LGNDWARE_ACCESS_TOKEN }}" \
-          https://github.com/lgndluke/lgndware/releases/download/lgndware-1.0.0-Dev/lgndware-1.0.0.jar
-          curl -L -o lgndware-lgndware-1.0.0-Dev.tar.gz -H "Authorization: token ${{ secrets.LGNDWARE_ACCESS_TOKEN }}" \
-          https://github.com/lgndluke/lgndware/archive/refs/tags/lgndware-1.0.0-Dev.tar.gz
-          file lgndware-lgndware-1.0.0-Dev.tar.gz
-          ls
+          wget https://github.com/lgndluke/lgndware/releases/download/lgndware-1.0.0-Dev/lgndware-1.0.0.jar
+          wget https://github.com/lgndluke/lgndware/archive/refs/tags/lgndware-1.0.0-Dev.tar.gz
           tar -xzvf lgndware-lgndware-1.0.0-Dev.tar.gz
           mv lgndware-1.0.0.jar lgndware-lgndware-1.0.0-Dev
           cd lgndware-lgndware-1.0.0-Dev
