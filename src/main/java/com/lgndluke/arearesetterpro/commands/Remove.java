@@ -3,8 +3,8 @@ package com.lgndluke.arearesetterpro.commands;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.data.AutoResetHandler;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
-import com.lgndluke.arearesetterpro.data.MessageHandler;
 import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
+import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,9 +28,10 @@ public class Remove implements CommandExecutor {
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static final Component prefix = MessageHandler.getMessageAsComponent("Prefix");
-    private final Component noPermission = MessageHandler.getMessageAsComponent("NoPermission");
-    private final String executedByConsole = MessageHandler.getMessageAsString("ExecutedByConsole");
+    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
+    private final String executedByConsole = messageHandler.getMessageAsString("ExecutedByConsole");
 
     //CommandExecutor
     @Override
@@ -61,9 +62,13 @@ public class Remove implements CommandExecutor {
     protected static class Remover implements Runnable {
 
         //Attributes
-        private final Component success = MessageHandler.getMessageAsComponent("RemoveSucceededMessage");
-        private final Component failed = MessageHandler.getMessageAsComponent("RemoveFailedMessage");
-        private final Component nonExist = MessageHandler.getMessageAsComponent("AreaNonExistent");
+        private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
+        private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+        private final AutoResetHandler autoResetHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getAutoResetHandler();
+        private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+        private final Component success = messageHandler.getMessageAsComponent("RemoveSucceededMessage");
+        private final Component failed = messageHandler.getMessageAsComponent("RemoveFailedMessage");
+        private final Component nonExist = messageHandler.getMessageAsComponent("AreaNonExistent");
         private final Player player;
         private final String areaName;
 
@@ -77,28 +82,32 @@ public class Remove implements CommandExecutor {
         @Override
         public void run() {
 
-            try {
-                ResultSet results = DatabaseHandler.getAreaData();
+            try { //TODO RE_WRITE! -> Only bugs once an area was reset!
+                ResultSet results = databaseHandler.getAreaData();
                 while(results.next()) {
                     if (results.getString("areaName").equals(this.areaName)) {
                         UUID uuid = UUID.fromString(results.getString("uuid"));
-                        DatabaseHandler.deleteAreaData(this.areaName);
-                        DatabaseHandler.deleteAreaStats(uuid);
-                        DatabaseHandler.deleteAreaTimer(uuid);
+                        databaseHandler.deleteAreaData(this.areaName);
+                        databaseHandler.deleteAreaStats(uuid);
+                        databaseHandler.deleteAreaTimer(uuid);
 
-                        String filePath = "AreaData/" + uuid + ".schem";
+                        String filePath = "/AreaData/" + uuid + ".schem";
                         File worldData = new File(areaPlugin.getDataFolder().getAbsolutePath(), filePath);
                         boolean worldDataDeleted = worldData.delete();
                         if (worldDataDeleted) {
                             this.player.sendMessage(prefix.append(this.success));
                         } else {
+                            areaPlugin.getLogger().log(Level.SEVERE, "Deletion of world data located at: " + worldData.getAbsoluteFile() + " failed.");
+                            areaPlugin.getLogger().log(Level.SEVERE, "Please manually delete this file to free up the occupied disk space!");
+                            areaPlugin.getLogger().log(Level.SEVERE, "This ISSUE does not affect AreaResetterPro's operationality!");
+                            areaPlugin.getLogger().log(Level.SEVERE, "The ISSUE is known and will be fixed in an upcoming version.");
                             this.player.sendMessage(prefix.append(this.failed));
                         }
                         return;
                     }
                 }
                 results.close();
-                AutoResetHandler.removeAreaResetter(this.areaName);
+                autoResetHandler.removeAreaResetter(this.areaName);
                 AreaResetterProExpansion.updateValues();
                 this.player.sendMessage(prefix.append(this.nonExist));
             } catch (SecurityException securityException) {

@@ -62,11 +62,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Install dependencies.
-        run: mvn install
-
-      - name: Build project.
-        run: mvn -B package --file pom.xml
+      - name: Download, unzip and install dependencies and build project.
+        run: |
+          wget https://github.com/lgndluke/lgndware/releases/download/lgndware-1.0.0-Dev/lgndware-1.0.0.jar
+          wget https://github.com/lgndluke/lgndware/archive/refs/tags/lgndware-1.0.0-Dev.tar.gz
+          ls -a
+          tar -xzvf lgndware-1.0.0-Dev.tar.gz
+          mv lgndware-1.0.0.jar lgndware-lgndware-1.0.0-Dev
+          cd lgndware-lgndware-1.0.0-Dev
+          mvn install:install-file -Dfile=lgndware-1.0.0.jar -DgroupId=com.lgndluke -DartifactId=lgndware -Dversion=1.0.0 -Dpackaging=jar -DpomFile=pom.xml
+          cd ..
+          mvn install
+          mvn -B package --file pom.xml
 
       - name: Create release directory and move .jar into it.
         run: |

@@ -1,11 +1,11 @@
 package com.lgndluke.arearesetterpro.commands;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.data.ConfigHandler;
-import com.lgndluke.arearesetterpro.data.MessageHandler;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
 import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
 import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
+import com.lgndluke.lgndware.data.ConfigHandler;
+import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.logging.Level;
 
 /**
@@ -26,10 +25,13 @@ public class Reload implements CommandExecutor {
 
     //Attributes
     private final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private final Component prefix = MessageHandler.getMessageAsComponent("Prefix");
-    private final Component reloadMsg = MessageHandler.getMessageAsComponent("ReloadConfigsMessage");
-    private final Component reloadFailedMsg = MessageHandler.getMessageAsComponent("ReloadConfigsFailedMessage");
-    private final Component noPermission = MessageHandler.getMessageAsComponent("NoPermission");
+    private final PositionsHandler positionsHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getPositionsHandler();
+    private final SpawnPointHandler spawnPointHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getSpawnPointHandler();
+    private final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler();
+    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private final Component reloadMsg = messageHandler.getMessageAsComponent("ReloadConfigsMessage");
+    private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
 
     //CommandExecutor
     @Override
@@ -48,29 +50,21 @@ public class Reload implements CommandExecutor {
 
     //Methods
     private void reloadByPlayer(CommandSender sender) {
-        try {
-            ConfigHandler.reload();
-            MessageHandler.reload();
-            PositionsHandler.reload();
-            SpawnPointHandler.reload();
-            AreaResetterProExpansion.updateValues();
-            sender.sendMessage(prefix.append(reloadMsg));
-        } catch (IOException io) {
-            sender.sendMessage(prefix.append(reloadFailedMsg));
-        }
+        configHandler.reload();
+        messageHandler.reload();
+        positionsHandler.reload();
+        spawnPointHandler.reload();
+        AreaResetterProExpansion.updateValues();
+        sender.sendMessage(prefix.append(reloadMsg));
     }
 
     private void reloadByConsole() {
-        try {
-            ConfigHandler.reload();
-            MessageHandler.reload();
-            PositionsHandler.reload();
-            SpawnPointHandler.reload();
-            AreaResetterProExpansion.updateValues();
-            areaPlugin.getLogger().log(Level.INFO, MessageHandler.getMessageAsString("ReloadConfigsMessage"));
-        } catch (IOException io) {
-            areaPlugin.getLogger().log(Level.SEVERE, MessageHandler.getMessageAsString("ReloadConfigsFailedMessage"));
-        }
+        configHandler.reload();
+        messageHandler.reload();
+        positionsHandler.reload();
+        spawnPointHandler.reload();
+        AreaResetterProExpansion.updateValues();
+        areaPlugin.getLogger().log(Level.INFO, messageHandler.getMessageAsString("ReloadConfigsMessage"));
     }
 
 }

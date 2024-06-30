@@ -1,8 +1,8 @@
 package com.lgndluke.arearesetterpro.commands;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.data.MessageHandler;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
+import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
@@ -22,9 +22,10 @@ public class GetPos implements CommandExecutor {
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static final Component prefix = MessageHandler.getMessageAsComponent("Prefix");
-    private final Component noPermission = MessageHandler.getMessageAsComponent("NoPermission");
-    private final String executedByConsole = MessageHandler.getMessageAsString("ExecutedByConsole");
+    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
+    private final String executedByConsole = messageHandler.getMessageAsString("ExecutedByConsole");
 
     //CommandExecutor
     @Override
@@ -49,8 +50,11 @@ public class GetPos implements CommandExecutor {
     private static class GetPosThread implements Runnable {
 
         //Attribute
-        private final Component noPos1 = MessageHandler.getMessageAsComponent("Pos1NotSet");
-        private final Component noPos2 = MessageHandler.getMessageAsComponent("Pos2NotSet");
+        private final PositionsHandler positionsHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getPositionsHandler();
+        private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+        private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+        private final Component noPos1 = messageHandler.getMessageAsComponent("Pos1NotSet");
+        private final Component noPos2 = messageHandler.getMessageAsComponent("Pos2NotSet");
         private final CommandSender sender;
 
         //Constructor
@@ -61,24 +65,24 @@ public class GetPos implements CommandExecutor {
         @Override
         public void run() {
 
-            if(PositionsHandler.getPosition(PositionsHandler.Position.POS1) != null && PositionsHandler.getPosition(PositionsHandler.Position.POS2) != null){
+            if(positionsHandler.getPosition(PositionsHandler.Position.POS1) != null && positionsHandler.getPosition(PositionsHandler.Position.POS2) != null){
 
                 Component pos1 = MiniMessage.miniMessage().deserialize("<blue> Position 1:</blue> \n" +
-                        "<light_purple>x: " + PositionsHandler.getPosition(PositionsHandler.Position.POS1).getX() + "\n" +
-                        "y: " + PositionsHandler.getPosition(PositionsHandler.Position.POS1).getY() + "\n" +
-                        "z: " + PositionsHandler.getPosition(PositionsHandler.Position.POS1).getZ() + "</light_purple>");
+                        "<light_purple>x: " + positionsHandler.getPosition(PositionsHandler.Position.POS1).getX() + "\n" +
+                        "y: " + positionsHandler.getPosition(PositionsHandler.Position.POS1).getY() + "\n" +
+                        "z: " + positionsHandler.getPosition(PositionsHandler.Position.POS1).getZ() + "</light_purple>");
 
                 Component pos2 = MiniMessage.miniMessage().deserialize("<blue> Position 2:</blue> \n" +
-                        "<light_purple>x: " + PositionsHandler.getPosition(PositionsHandler.Position.POS2).getX() + "\n" +
-                        "y: " + PositionsHandler.getPosition(PositionsHandler.Position.POS2).getY() + "\n" +
-                        "z: " + PositionsHandler.getPosition(PositionsHandler.Position.POS2).getZ() + "</light_purple>");
+                        "<light_purple>x: " + positionsHandler.getPosition(PositionsHandler.Position.POS2).getX() + "\n" +
+                        "y: " + positionsHandler.getPosition(PositionsHandler.Position.POS2).getY() + "\n" +
+                        "z: " + positionsHandler.getPosition(PositionsHandler.Position.POS2).getZ() + "</light_purple>");
 
                 sender.sendMessage(prefix.append(pos1));
                 sender.sendMessage(prefix.append(pos2));
 
-            } else if(PositionsHandler.getPosition(PositionsHandler.Position.POS1) == null) {
+            } else if(positionsHandler.getPosition(PositionsHandler.Position.POS1) == null) {
                 sender.sendMessage(prefix.append(noPos1));
-            } else if (PositionsHandler.getPosition(PositionsHandler.Position.POS2) == null) {
+            } else if (positionsHandler.getPosition(PositionsHandler.Position.POS2) == null) {
                 sender.sendMessage(prefix.append(noPos2));
             }
 

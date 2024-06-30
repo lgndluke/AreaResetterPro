@@ -1,11 +1,10 @@
 package com.lgndluke.arearesetterpro.commands;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.data.MessageHandler;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
+import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -22,7 +21,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,9 +33,10 @@ public class Tool implements CommandExecutor {
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static final Component prefix = MessageHandler.getMessageAsComponent("Prefix");
-    private final Component noPermission = MessageHandler.getMessageAsComponent("NoPermission");
-    private final String executedByConsole = MessageHandler.getMessageAsString("ExecutedByConsole");
+    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+    private final Component noPermission = messageHandler.getMessageAsComponent("NoPermission");
+    private final String executedByConsole = messageHandler.getMessageAsString("ExecutedByConsole");
 
     //CommandExecutor
     @Override
@@ -155,12 +154,14 @@ public class Tool implements CommandExecutor {
      * This class is used to do read/write operations to the "Positions.yml" file.
      * @author lgndluke
      **/
-    protected static class SavePosThread implements Runnable {
+    public static class SavePosThread implements Runnable {
 
         //Attributes
-        private final Component setPos1 = MessageHandler.getMessageAsComponent("SetPos1Message");
-        private final Component setPos2 = MessageHandler.getMessageAsComponent("SetPos2Message");
-        private final Component setPosFailed = MessageHandler.getMessageAsComponent("SetPosFailed");
+        private final PositionsHandler positionsHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getPositionsHandler();
+        private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+        private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
+        private final Component setPos1 = messageHandler.getMessageAsComponent("SetPos1Message");
+        private final Component setPos2 = messageHandler.getMessageAsComponent("SetPos2Message");
         private final Player player;
         private final PositionsHandler.Position pos;
         private final Location location;
@@ -176,41 +177,29 @@ public class Tool implements CommandExecutor {
         @Override
         public void run() {
 
-            try {
+            //This if-Statement is required to reset positions on area creation.
+            if(this.player == null) {
 
-                //This if-Statement is required to reset positions on area creation.
-                if(this.player == null) {
+                positionsHandler.setPosition(PositionsHandler.Position.POS1, null);
+                positionsHandler.setPosition(PositionsHandler.Position.POS2, null);
+                positionsHandler.save();
+                positionsHandler.reload();
+                return;
 
-                    PositionsHandler.setPosition(PositionsHandler.Position.POS1, null);
-                    PositionsHandler.setPosition(PositionsHandler.Position.POS2, null);
-                    PositionsHandler.save();
-                    PositionsHandler.reload();
-                    return;
+            } else {
 
+                positionsHandler.setPosition(this.pos, this.location);
+                positionsHandler.save();
+
+                if(this.pos == (PositionsHandler.Position.POS1)) {
+                    player.sendMessage(prefix.append(this.setPos1));
                 } else {
-
-                    PositionsHandler.setPosition(this.pos, this.location);
-                    PositionsHandler.save();
-
-                    if(this.pos == (PositionsHandler.Position.POS1)) {
-                        player.sendMessage(prefix.append(this.setPos1));
-                    } else {
-                        player.sendMessage(prefix.append(this.setPos2));
-                    }
-
+                    player.sendMessage(prefix.append(this.setPos2));
                 }
-
-                PositionsHandler.reload();
-
-            } catch (IOException io) {
-
-                if(this.player != null) {
-                    this.player.sendMessage(prefix.append(this.setPosFailed));
-                }
-                String plainSetPosFailed = PlainTextComponentSerializer.plainText().serialize(setPosFailed);
-                areaPlugin.getLogger().log(Level.SEVERE, plainSetPosFailed, io);
 
             }
+
+            positionsHandler.reload();
 
         }
 
