@@ -59,9 +59,6 @@ SetSpawnPointMessage: '<green>Successfully set spawnpoint</green>'
 
 #Used when saving process of a position fails.
 SetSpawnPointFailed: '<red>Could not save current spawnpoint. Check console for more information.</red>'
-
-#Command 'arp_getSpawnPoint'
-SpawnPointNotSet: '<red>Spawnpoint has not been set!</red>'
 #--------------------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------------------

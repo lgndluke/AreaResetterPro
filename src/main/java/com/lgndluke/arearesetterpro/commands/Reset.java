@@ -120,13 +120,14 @@ public class Reset implements CommandExecutor {
                         String filePath = "AreaData/" + uuid + ".schem";
                         File worldData = new File(areaPlugin.getDataFolder().getAbsolutePath(), filePath);
 
-                        List<Player> activePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
-                        for(Player player : activePlayers) {
-                            if(isInsideArea(player, new Location(WorldCreator.name(worldName).createWorld(), xVal1, yVal1, zVal1),
-                                    new Location(WorldCreator.name(worldName).createWorld(), xVal2, yVal2, zVal2)))
-                            {
-                                player.sendMessage(prefix.append(this.resetMsgPlayer));
-                                player.teleportAsync(new Location(WorldCreator.name(worldName).createWorld(), xValSpawn, yValSpawn, zValSpawn));
+                        if(xVal1 != xValSpawn && yVal1 != yValSpawn && zVal1 != zValSpawn) {
+                            List<Player> activePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
+                            for (Player player : activePlayers) {
+                                if (isInsideArea(player, new Location(WorldCreator.name(worldName).createWorld(), xVal1, yVal1, zVal1),
+                                        new Location(WorldCreator.name(worldName).createWorld(), xVal2, yVal2, zVal2))) {
+                                    player.sendMessage(prefix.append(this.resetMsgPlayer));
+                                    player.teleportAsync(new Location(WorldCreator.name(worldName).createWorld(), xValSpawn, yValSpawn, zValSpawn));
+                                }
                             }
                         }
 

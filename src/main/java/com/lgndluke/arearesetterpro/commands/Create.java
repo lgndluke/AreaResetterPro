@@ -89,7 +89,6 @@ public class Create implements CommandExecutor {
         private final Component failed = messageHandler.getMessageAsComponent("CreationFailedMessage");
         private final Component noPos1 = messageHandler.getMessageAsComponent("Pos1NotSet");
         private final Component noPos2 = messageHandler.getMessageAsComponent("Pos2NotSet");
-        private final Component noSpawn = messageHandler.getMessageAsComponent("SpawnPointNotSet");
         private final Component areaAlreadyExists = messageHandler.getMessageAsComponent("AreaAlreadyExists");
         private final Component creationStarted = messageHandler.getMessageAsComponent("AreaCreationStartedMessage");
         private final Component creationFinished = messageHandler.getMessageAsComponent("CreationSucceededMessage");
@@ -110,9 +109,9 @@ public class Create implements CommandExecutor {
                 //----------------------------------------------------------------------------------------------------
 
                 Location[] positions = getLocations();
-                Location spawnpoint = getSpawnpoint();
+                Location spawnPoint = getSpawnpoint();
 
-                if(positions == null || spawnpoint == null || !validAreaName()) {
+                if(positions == null || !validAreaName()) {
                     return;
                 }
 
@@ -124,7 +123,13 @@ public class Create implements CommandExecutor {
                 createAreaDataFolder();
 
                 UUID uuid = UUID.randomUUID();
-                databaseHandler.insertAreaData(uuid, areaName, positions[0].getWorld().getName(), positions[0], positions[1], spawnpoint);
+
+                if(spawnPoint != null) {
+                    databaseHandler.insertAreaData(uuid, areaName, positions[0].getWorld().getName(), positions[0], positions[1], spawnPoint);
+                } else {
+                    databaseHandler.insertAreaData(uuid, areaName, positions[0].getWorld().getName(), positions[0], positions[1], positions[0]);
+                }
+
                 saveAreaDataSchematics(uuid, positions);
                 databaseHandler.insertAreaStats(uuid, ((long) (Math.abs(positions[0].getBlockX() - positions[1].getBlockX()) + 1) *
                                                               (Math.abs(positions[0].getBlockY() - positions[1].getBlockY()) + 1) *
@@ -166,16 +171,7 @@ public class Create implements CommandExecutor {
         }
 
         private Location getSpawnpoint() {
-
-            Location spawnpoint = spawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT);
-
-            if(spawnpoint == null) {
-                player.sendMessage(prefix.append(noSpawn));
-                return null;
-            }
-
-            return spawnpoint;
-
+            return spawnPointHandler.getSpawnPoint(SpawnPointHandler.SpawnPoint.SPAWNPOINT);
         }
 
         private boolean validAreaName() {
