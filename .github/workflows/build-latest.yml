@@ -69,9 +69,6 @@ jobs:
           curl -L -o lgndware-lgndware-1.0.0-Dev.zip -H "Authorization: token ${{ secrets.LGNDWARE_ACCESS_TOKEN }}" \
           https://github.com/lgndluke/lgndware/archive/refs/tags/lgndware-1.0.0-Dev.zip
           ls -la
-          unzip lgndware-lgndware-1.0.0-Dev.zip
-          mv lgndware-1.0.0.jar lgndware-lgndware-1.0.0-Dev
-          cd lgndware-lgndware-1.0.0-Dev
 
       - name: Install dependencies and build project.
         run: |
