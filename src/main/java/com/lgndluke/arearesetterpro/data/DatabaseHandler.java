@@ -1,7 +1,6 @@
 package com.lgndluke.arearesetterpro.data;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
 import com.lgndluke.lgndware.data.AbstractDatabaseHandler;
 import com.lgndluke.lgndware.data.ConfigHandler;
 import org.bukkit.Location;
@@ -36,11 +35,9 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             createDatabase();
             connect();
             createTables();
-            //Enable PlaceholderAPI expansion.
-            AreaResetterProExpansion.updateValues();
             return true;
         });
-        return super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), initDatabaseHandler, 10, TimeUnit.SECONDS);
+        return super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), initDatabaseHandler, 10, TimeUnit.SECONDS);
     }
 
     public ResultSet getAreaData() {
@@ -53,7 +50,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
                 return null;
             }
         });
-        return super.getAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaDataTask, 10, TimeUnit.SECONDS);
+        return super.getDefaultAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaDataTask, 10, TimeUnit.SECONDS);
     }
 
     public ResultSet getAreaData(String areaName) {
@@ -67,7 +64,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
                 return null;
             }
         });
-        return super.getAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaDataTask, 10, TimeUnit.SECONDS);
+        return super.getDefaultAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaDataTask, 10, TimeUnit.SECONDS);
     }
 
     public void insertAreaData(UUID uuid, String areaName, String worldName, Location pos1, Location pos2, Location spawn) {
@@ -98,7 +95,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             }
             return true;
         });
-        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), insertAreaDataTask, 10, TimeUnit.SECONDS);
+        super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), insertAreaDataTask, 10, TimeUnit.SECONDS);
     }
 
     public void deleteAreaData(String areaName) {
@@ -113,7 +110,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             }
             return true;
         });
-        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaDataTask, 10, TimeUnit.SECONDS);
+        super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaDataTask, 10, TimeUnit.SECONDS);
     }
 
     public ResultSet getAreaStats(UUID uuid) {
@@ -127,7 +124,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
                 return null;
             }
         });
-        return super.getAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaStatsTask, 10, TimeUnit.SECONDS);
+        return super.getDefaultAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
     public void insertAreaStats(UUID uuid, long overallBlocks) {
@@ -146,7 +143,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             }
             return true;
         });
-        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), insertAreaStatsTask, 10, TimeUnit.SECONDS);
+        super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), insertAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
     public void updateAreaStatsTimesReset(UUID uuid, int timesReset) {
@@ -162,7 +159,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             }
             return true;
         });
-        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), updateAreaStatsTask, 10, TimeUnit.SECONDS);
+        super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), updateAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
     public void deleteAreaStats(UUID uuid) {
@@ -177,7 +174,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             }
             return true;
         });
-        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaStatsTask, 10, TimeUnit.SECONDS);
+        super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
     public ResultSet getAreaTimer(UUID uuid) {
@@ -191,7 +188,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
                 return null;
             }
         });
-        return super.getAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaTimerTask, 10, TimeUnit.SECONDS);
+        return super.getDefaultAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaTimerTask, 10, TimeUnit.SECONDS);
     }
 
     public void insertAreaTimer(UUID uuid, int configTimerValue) {
@@ -207,7 +204,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             }
             return true;
         });
-        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), insertAreaTimerTask, 10, TimeUnit.SECONDS);
+        super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), insertAreaTimerTask, 10, TimeUnit.SECONDS);
     }
 
     public void updateAreaTimerTimerValue(UUID uuid, int timerValue) {
@@ -223,7 +220,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             }
             return true;
         });
-        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), updateAreaTimerTask, 10, TimeUnit.SECONDS);
+        super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), updateAreaTimerTask, 10, TimeUnit.SECONDS);
     }
 
     public void deleteAreaTimer(UUID uuid) {
@@ -238,7 +235,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             }
             return true;
         });
-        super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaStatsTask, 10, TimeUnit.SECONDS);
+        super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaStatsTask, 10, TimeUnit.SECONDS);
     }
 
     @Override

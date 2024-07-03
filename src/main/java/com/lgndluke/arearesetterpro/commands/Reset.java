@@ -3,7 +3,6 @@ package com.lgndluke.arearesetterpro.commands;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
-import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
 import com.lgndluke.lgndware.data.MessageHandler;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.kyori.adventure.text.Component;
@@ -30,7 +29,7 @@ import java.util.logging.Level;
  * This Class handles the 'arp_reset' command.
  * @author lgndluke
  **/
-public class Reset implements CommandExecutor {
+public class Reset implements CommandExecutor { //TODO Completely rework this process!
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
@@ -72,8 +71,8 @@ public class Reset implements CommandExecutor {
     protected static class ResetArea implements Runnable {
 
         //Attributes
-        private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
         private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+        private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
         private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
         private final Component success = messageHandler.getMessageAsComponent("AreaResetSuccessful");
         private final Component nonExist = messageHandler.getMessageAsComponent("AreaNonExistent");
@@ -190,9 +189,8 @@ public class Reset implements CommandExecutor {
 
     protected static class ResetAllAreas implements Runnable {
 
-        //Attributes
-        private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
         private final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
+        private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
         private final CommandSender sender;
 
         //Constructor
@@ -208,7 +206,6 @@ public class Reset implements CommandExecutor {
                     areaPlugin.getServer().getScheduler().runTaskAsynchronously(areaPlugin, new ResetArea(sender, results.getString("areaName")));
                 }
                 results.close();
-                AreaResetterProExpansion.updateValues();
             } catch (SQLException se) {
                 areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
             }

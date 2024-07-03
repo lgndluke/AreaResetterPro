@@ -18,7 +18,7 @@ import java.util.logging.Level;
  *  This Class handles the 'arp_getSpawnPoint' command.
  *  @author lgndluke
  **/
-public class GetSpawnPoint implements CommandExecutor {
+public class GetSpawnPoint implements CommandExecutor { //TODO Completely rework this process!
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);

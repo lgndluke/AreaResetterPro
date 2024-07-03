@@ -3,7 +3,6 @@ package com.lgndluke.arearesetterpro.commands;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.data.AutoResetHandler;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
-import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
 import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
@@ -24,7 +23,7 @@ import java.util.logging.Level;
  * @author lgndluke
  **/
 //Maybe implement console removal? -> on request maybe?
-public class Remove implements CommandExecutor {
+public class Remove implements CommandExecutor { //TODO Completely rework this process!
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
@@ -108,7 +107,7 @@ public class Remove implements CommandExecutor {
                 }
                 results.close();
                 autoResetHandler.removeAreaResetter(this.areaName);
-                AreaResetterProExpansion.updateValues();
+                AreaResetterPro.getPlugin(AreaResetterPro.class).getAreaResetterProExpansion().updateValues();
                 this.player.sendMessage(prefix.append(this.nonExist));
             } catch (SecurityException securityException) {
                 this.player.sendMessage(prefix.append(this.failed));

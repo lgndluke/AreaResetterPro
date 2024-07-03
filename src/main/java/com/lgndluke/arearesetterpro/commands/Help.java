@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
-public class Help implements CommandExecutor {
+public class Help implements CommandExecutor { //TODO Completely rework this process!
 
     //Attributes
     private final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);

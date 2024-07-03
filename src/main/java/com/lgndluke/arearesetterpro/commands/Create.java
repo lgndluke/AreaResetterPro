@@ -6,16 +6,11 @@ import com.lgndluke.arearesetterpro.data.AutoResetHandler;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
 import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
-import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
 import com.lgndluke.lgndware.data.ConfigHandler;
 import com.lgndluke.lgndware.data.MessageHandler;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
-import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -43,7 +38,7 @@ import static com.lgndluke.arearesetterpro.data.PositionsHandler.Position.POS2;
  * This Class handles the 'arp_create' command.
  * @author lgndluke
  **/
-public class Create implements CommandExecutor {
+public class Create implements CommandExecutor { //TODO Completely rework this process!
 
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
     private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
@@ -138,7 +133,8 @@ public class Create implements CommandExecutor {
                 int configTimerValue = (int) configHandler.get("DefaultTimerValue");
                 databaseHandler.insertAreaTimer(uuid, configTimerValue);
                 autoResetHandler.addNewAutoResetter(areaName, configTimerValue);
-                AreaResetterProExpansion.updateValues();
+
+                AreaResetterPro.getPlugin(AreaResetterPro.class).getAreaResetterProExpansion().updateValues();
 
                 player.sendMessage(prefix.append(success));
                 areaPlugin.getServer().getScheduler().runTaskAsynchronously(areaPlugin, new Tool.SavePosThread(null, null, null));
@@ -215,15 +211,9 @@ public class Create implements CommandExecutor {
                                              BlockVector3.at(positions[1].getBlockX(), positions[1].getBlockY(), positions[1].getBlockZ()));
             region.setWorld(FaweAPI.getWorld(positions[0].getWorld().getName()));
 
-            Clipboard clip = new BlockArrayClipboard(region);
             EditSession editSession = WorldEdit.getInstance().newEditSession(FaweAPI.getWorld(positions[0].getWorld().getName()));
-            ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(editSession, region, clip, region.getMinimumPoint());
-            forwardExtentCopy.setCopyingEntities((boolean) configHandler.get("SaveEntities"));
-            Operations.complete(forwardExtentCopy);
+            editSession.lazyCopy(region).save(data, BuiltInClipboardFormat.FAST);
             editSession.close();
-            clip.save(data, BuiltInClipboardFormat.FAST);
-            clip.close();
-
         }
 
     }

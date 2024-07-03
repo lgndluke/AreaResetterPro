@@ -29,6 +29,7 @@ public final class AreaResetterPro extends JavaPlugin {
 
     private final List<AbstractHandler> handlerList = new ArrayList<>();
     private final List<Boolean> handlerInitList = new ArrayList<>();
+    private AreaResetterProExpansion areaResetterProExpansion;
 
     @Override
     public void onEnable() {
@@ -88,7 +89,9 @@ public final class AreaResetterPro extends JavaPlugin {
         listenerLoader.load();
 
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new AreaResetterProExpansion().register();
+            areaResetterProExpansion = new AreaResetterProExpansion();
+            areaResetterProExpansion.register();
+            areaResetterProExpansion.updateValues();
         }
 
     }
@@ -122,6 +125,10 @@ public final class AreaResetterPro extends JavaPlugin {
 
     public AutoResetHandler getAutoResetHandler() {
         return (AutoResetHandler) this.handlerList.get(7);
+    }
+
+    public AreaResetterProExpansion getAreaResetterProExpansion() {
+        return this.areaResetterProExpansion;
     }
 
 }

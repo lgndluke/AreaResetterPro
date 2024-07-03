@@ -2,7 +2,6 @@ package com.lgndluke.arearesetterpro.data;
 
 import com.fastasyncworldedit.core.FaweAPI;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
 import com.lgndluke.lgndware.data.AbstractHandler;
 import com.lgndluke.lgndware.data.MessageHandler;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -21,22 +20,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 
-/**
- * This Class handles automatic resets.
- * @author lgndluke
- **/
 public class AutoResetHandler extends AbstractHandler {
 
-    private final Plugin areaPlugin = super.getPlugin();
     private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
     private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
-    private static final List<AutoResetter> autoResetterList = new ArrayList<>();
+    private List<AutoResetter> autoResetterList = new ArrayList<>();
 
     public AutoResetHandler(JavaPlugin plugin) {
         super(plugin);
@@ -69,20 +60,20 @@ public class AutoResetHandler extends AbstractHandler {
             }
             return true;
         });
-        return super.getAsyncExecutor().executeFuture(super.getPlugin().getLogger(), initAutoResetHandler, 10, TimeUnit.SECONDS);
+        return super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), initAutoResetHandler, 10, TimeUnit.SECONDS);
     }
 
     @Override
     public boolean terminate() {
-        if(!super.getAsyncExecutor().isShutdown()) {
-            super.getAsyncExecutor().shutdown();
+        if(!super.getDefaultAsyncExecutor().isShutdown()) {
+            super.getDefaultAsyncExecutor().shutdown();
             return true;
         }
         return false;
     }
 
     public void addNewAutoResetter(String areaName, long resetInterval) {
-        autoResetterList.add(new AutoResetter(areaName, resetInterval*20));
+        autoResetterList.add(new AutoResetter(super.getPlugin(), areaName, resetInterval*20));
     }
 
     public void updateAreaResetInterval(String areaName, long resetInterval) {
@@ -111,97 +102,84 @@ public class AutoResetHandler extends AbstractHandler {
         return -1;
     }
 
-    //Inner Classes
-    private class AutoResetter implements Runnable {
+    private class AutoResetter {
 
-        //Attributes
         private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
         private final Component resetMsgPlayer = messageHandler.getMessageAsComponent("ResetMessagePlayer");
+        private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        private final Plugin plugin;
         private final String areaName;
         private long resetInterval;
         private long timeRemaining;
-        private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-        //Constructor
-        private AutoResetter(String areaName, Long resetInterval) {
+        private AutoResetter(Plugin plugin, String areaName, Long resetInterval) {
+            this.plugin = plugin;
             this.areaName = areaName;
             this.resetInterval = resetInterval;
-            areaPlugin.getServer().getScheduler().runTaskLaterAsynchronously(areaPlugin, this, this.resetInterval);
-            areaPlugin.getServer().getScheduler().runTaskAsynchronously(areaPlugin, () -> countDown((resetInterval/20)));
+            this.timeRemaining = resetInterval/20;
+            plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, execute(), resetInterval);
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, this::countDown);
         }
 
-        //Runnable
-        @Override
-        public void run() { //TODO RE_WRITE PROCESS! -> Only resets/reloads timer on autoreset -> not on instant reset -> annoying!
+        private FutureTask<Boolean> execute() {
+            return new FutureTask<Boolean>(() -> {
+                try {
+                    ResultSet results = databaseHandler.getAreaData();
+                    while(results.next()) {
+                        if(results.getString("areaName").equals(areaName)) {
+                            UUID uuid = UUID.fromString(results.getString("uuid"));
+                            String worldName = results.getString("world");
 
-            try {
+                            int[] pos1 = new int[] { results.getInt("xValPos1"),
+                                                     results.getInt("yValPos1"),
+                                                     results.getInt("zValPos1")};
 
-                ResultSet results = databaseHandler.getAreaData();
+                            int[] pos2 = new int[] { results.getInt("xValPos2"),
+                                                     results.getInt("yValPos2"),
+                                                     results.getInt("zValPos2")};
 
-                while(results.next()) {
+                            int[] spawn = new int[] { results.getInt("xValSpawn"),
+                                                      results.getInt("yValSpawn"),
+                                                      results.getInt("zValSpawn")};
 
-                    if(results.getString("areaName").equals(areaName)) {
+                            ResultSet areaStats = databaseHandler.getAreaStats(uuid);
+                            int timesReset = areaStats.getInt("timesReset");
+                            areaStats.close();
 
-                        UUID uuid = UUID.fromString(results.getString("uuid"));
-                        String worldName = results.getString("world");
+                            String filePath = "AreaData/" + uuid + ".schem";
+                            File worldData = new File(plugin.getDataFolder().getAbsolutePath(), filePath);
 
-                        int xVal1 = results.getInt("xValPos1");
-                        int yVal1 = results.getInt("yValPos1");
-                        int zVal1 = results.getInt("zValPos1");
-
-                        int xVal2 = results.getInt("xValPos2");
-                        int yVal2 = results.getInt("yValPos2");
-                        int zVal2 = results.getInt("zValPos2");
-
-                        int xValSpawn = results.getInt("xValSpawn");
-                        int yValSpawn = results.getInt("yValSpawn");
-                        int zValSpawn = results.getInt("zValSpawn");
-
-                        results.close();
-
-                        ResultSet areaStats = databaseHandler.getAreaStats(uuid);
-                        int timesReset = areaStats.getInt("timesReset");
-                        areaStats.close();
-
-                        String filePath = "AreaData/" + uuid + ".schem";
-                        File worldData = new File(areaPlugin.getDataFolder().getAbsolutePath(), filePath);
-
-                        if(xVal1 != xValSpawn && yVal1 != yValSpawn && zVal1 != zValSpawn) {
-                            Bukkit.getScheduler().runTask(areaPlugin, () -> {
-                                List<Player> activePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
-                                for (Player player : activePlayers) {
-                                    if (isInsideArea(player, new Location(WorldCreator.name(worldName).createWorld(), xVal1, yVal1, zVal1),
-                                            new Location(WorldCreator.name(worldName).createWorld(), xVal2, yVal2, zVal2))) {
-                                        player.sendMessage(prefix.append(resetMsgPlayer));
-                                        player.teleportAsync(new Location(WorldCreator.name(worldName).createWorld(), xValSpawn, yValSpawn, zValSpawn));
+                            if(pos1[0] != spawn[0] && pos1[1] != spawn[1] && pos1[2] != spawn[2]) {
+                                Bukkit.getScheduler().runTask(plugin, () -> {
+                                    List<Player> activePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
+                                    for (Player player : activePlayers) {
+                                        if (isInsideArea(player, new Location(WorldCreator.name(worldName).createWorld(), pos1[0], pos1[1], pos1[2]),
+                                                new Location(WorldCreator.name(worldName).createWorld(), pos2[0], pos2[1], pos2[2]))) {
+                                            player.sendMessage(prefix.append(resetMsgPlayer));
+                                            player.teleportAsync(new Location(WorldCreator.name(worldName).createWorld(), spawn[0], spawn[1], spawn[2]));
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
+                            FaweAPI.load(worldData).paste(FaweAPI.getWorld(worldName), BlockVector3.at(Math.min(pos1[0], pos2[0]), Math.min(pos1[1], pos2[1]), Math.min(pos1[2], pos2[2])));
+                            databaseHandler.updateAreaStatsTimesReset(uuid, timesReset);
+
+                            plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, execute(), resetInterval);
+                            this.timeRemaining = this.resetInterval/20;
+                            AreaResetterPro.getPlugin(AreaResetterPro.class).getAreaResetterProExpansion().updateValues();
                         }
-
-                        FaweAPI.load(worldData).paste(FaweAPI.getWorld(worldName), BlockVector3.at(Math.min(xVal1, xVal2), Math.min(yVal1, yVal2), Math.min(zVal1, zVal2)));
-                        databaseHandler.updateAreaStatsTimesReset(uuid, timesReset);
-
                     }
-
+                    results.close();
+                } catch (SQLException se) {
+                    plugin.getLogger().log(Level.SEVERE, "AutoResetter: Couldn't fetch AreaData!", se);
+                } catch (IOException io) {
+                    plugin.getLogger().log(Level.SEVERE, "AutoResetter: Could not reset area: " + areaName);
+                    plugin.getLogger().log(Level.SEVERE, "AutoResetter: An error occurred whilst trying to reset the area.", io);
                 }
-
-            } catch (SQLException se) {
-                areaPlugin.getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
-            } catch (IOException e) {
-                areaPlugin.getLogger().log(Level.SEVERE, "AutoResetter: Could not reset area: " + areaName);
-                areaPlugin.getLogger().log(Level.SEVERE, "AutoResetter: An Error occurred whilst trying to reset the area.", e);
-            }
-
-            //Resets the timer with a new value.
-            areaPlugin.getServer().getScheduler().runTaskLaterAsynchronously(areaPlugin, this, this.resetInterval);
-            this.timeRemaining = this.resetInterval/20;
-            AreaResetterProExpansion.updateValues();
-            //-----------------------------------------------------------
-
+                return true;
+            });
         }
 
-        //Methods
         private boolean isInsideArea(Player player, Location pos1, Location pos2) {
 
             double xValPlayer = player.getLocation().getBlockX();
@@ -221,13 +199,10 @@ public class AutoResetHandler extends AbstractHandler {
 
         }
 
-        private void countDown(long timeRemaining) {
-            this.timeRemaining = timeRemaining;
+        private void countDown() {
             scheduler.scheduleAtFixedRate(() -> {
                 if(this.timeRemaining > 0) {
                     this.timeRemaining--;
-                } else {
-                    scheduler.shutdown();
                 }
             }, 0, 1, TimeUnit.SECONDS);
         }

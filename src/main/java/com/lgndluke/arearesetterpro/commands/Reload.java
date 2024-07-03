@@ -3,7 +3,6 @@ package com.lgndluke.arearesetterpro.commands;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
 import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
-import com.lgndluke.arearesetterpro.placeholders.AreaResetterProExpansion;
 import com.lgndluke.lgndware.data.ConfigHandler;
 import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
@@ -21,7 +20,7 @@ import java.util.logging.Level;
  * Reloads ONLY config files.
  * @author lgndluke
  **/
-public class Reload implements CommandExecutor {
+public class Reload implements CommandExecutor { //TODO Completely rework this process!
 
     //Attributes
     private final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
@@ -54,7 +53,7 @@ public class Reload implements CommandExecutor {
         messageHandler.reload();
         positionsHandler.reload();
         spawnPointHandler.reload();
-        AreaResetterProExpansion.updateValues();
+        AreaResetterPro.getPlugin(AreaResetterPro.class).getAreaResetterProExpansion().updateValues();
         sender.sendMessage(prefix.append(reloadMsg));
     }
 
@@ -63,7 +62,7 @@ public class Reload implements CommandExecutor {
         messageHandler.reload();
         positionsHandler.reload();
         spawnPointHandler.reload();
-        AreaResetterProExpansion.updateValues();
+        AreaResetterPro.getPlugin(AreaResetterPro.class).getAreaResetterProExpansion().updateValues();
         areaPlugin.getLogger().log(Level.INFO, messageHandler.getMessageAsString("ReloadConfigsMessage"));
     }
 

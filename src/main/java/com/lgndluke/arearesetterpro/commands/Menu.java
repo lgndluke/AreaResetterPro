@@ -35,7 +35,7 @@ import java.util.logging.Level;
  * This Class handles the 'arp_menu' command.
  * @author lgndluke
  **/
-public class Menu implements CommandExecutor {
+public class Menu implements CommandExecutor { //TODO Completely rework this process!
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);

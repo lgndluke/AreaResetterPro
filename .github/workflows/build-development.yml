@@ -116,7 +116,7 @@ jobs:
           tag_name: ${{ env.JAR_BASENAME }}-Dev
           release_name: ${{ env.JAR_BASENAME }}-Dev
           draft: false
-          prerelease: false
+          prerelease: true
 
       - name: Upload .jar to release
         uses: actions/upload-release-asset@v1

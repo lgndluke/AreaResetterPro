@@ -29,7 +29,7 @@ import java.util.logging.Level;
  * This Class handles the 'arp_tool' command.
  * @author lgndluke
  **/
-public class Tool implements CommandExecutor {
+public class Tool implements CommandExecutor { //TODO Completely rework this process!
 
     //Attributes
     private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
