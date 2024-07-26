@@ -68,6 +68,7 @@ public class AreaResetterProExpansion extends PlaceholderExpansion {
 
     public void updateValues() {
         try {
+            areaDataList.clear();
             ResultSet results = databaseHandler.getAreaData();
             if(results != null) {
                 while (results.next()) {

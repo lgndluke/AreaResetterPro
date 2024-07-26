@@ -21,11 +21,7 @@ import java.util.List;
 public final class AreaResetterPro extends JavaPlugin {
 
     //TODO Before Releasing AreaResetterPro Version 1.4
-    // -> IMPORTANT -> Add GUI and COMMAND capabilities to lgndware and re-write the plugin's whole command section.
-    // -> IMPORTANT -> Fix to-do in AutoResetHandler.
     // -> Add Enable/Disable Resets feature for Areas.
-    // -> Change the entity saving mechanism to not be a config-option anymore! -> Make it a create command argument.
-    // -> Take a look at the Spawnpoint system and think about how to improve it further.
 
     private final List<AbstractHandler> handlerList = new ArrayList<>();
     private final List<Boolean> handlerInitList = new ArrayList<>();
@@ -35,27 +31,27 @@ public final class AreaResetterPro extends JavaPlugin {
     public void onEnable() {
 
         MetricsHandler metricsHandler = new MetricsHandler(this, 19274);
-        handlerList.add(metricsHandler); //0
+        handlerList.add(metricsHandler);
         handlerInitList.add(metricsHandler.initialize());
 
         UpdateHandler updateHandler = new UpdateHandler(this, 109372);
-        handlerList.add(updateHandler); //1
+        handlerList.add(updateHandler);
         handlerInitList.add(updateHandler.initialize());
 
         PositionsHandler positionsHandler = new PositionsHandler(this, "Positions.yml");
-        handlerList.add(positionsHandler); //2
+        handlerList.add(positionsHandler);
         handlerInitList.add(positionsHandler.initialize());
 
         SpawnPointHandler spawnPointHandler = new SpawnPointHandler(this, "SpawnPoint.yml");
-        handlerList.add(spawnPointHandler); //3
+        handlerList.add(spawnPointHandler);
         handlerInitList.add(spawnPointHandler.initialize());
 
         ConfigHandler configHandler = new ConfigHandler(this);
-        handlerList.add(configHandler); //4
+        handlerList.add(configHandler);
         handlerInitList.add(configHandler.initialize());
 
         MessageHandler messageHandler = new MessageHandler(this);
-        handlerList.add(messageHandler); //5
+        handlerList.add(messageHandler);
         handlerInitList.add(messageHandler.initialize());
 
         while(!handlerInitList.get(5)) {
@@ -79,7 +75,7 @@ public final class AreaResetterPro extends JavaPlugin {
         }
 
         AutoResetHandler autoResetHandler = new AutoResetHandler(this);
-        handlerList.add(autoResetHandler); //7
+        handlerList.add(autoResetHandler);
         handlerInitList.add(autoResetHandler.initialize());
 
         CommandLoader commandLoader = new CommandLoader(this);
@@ -91,7 +87,9 @@ public final class AreaResetterPro extends JavaPlugin {
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             areaResetterProExpansion = new AreaResetterProExpansion();
             areaResetterProExpansion.register();
-            areaResetterProExpansion.updateValues();
+            if(((Boolean) configHandler.get("EnableAutoResets")) && autoResetHandler.isInitialized()) {
+                AreaResetterPro.getPlugin(AreaResetterPro.class).getAreaResetterProExpansion().updateValues();
+            }
         }
 
     }

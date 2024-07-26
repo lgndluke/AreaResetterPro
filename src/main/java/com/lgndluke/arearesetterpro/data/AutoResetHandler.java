@@ -1,33 +1,31 @@
 package com.lgndluke.arearesetterpro.data;
 
-import com.fastasyncworldedit.core.FaweAPI;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
+import com.lgndluke.arearesetterpro.tasks.ResetTask;
 import com.lgndluke.lgndware.data.AbstractHandler;
-import com.lgndluke.lgndware.data.MessageHandler;
-import com.sk89q.worldedit.math.BlockVector3;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.WorldCreator;
-import org.bukkit.entity.Player;
+import com.lgndluke.lgndware.data.ConfigHandler;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+/**
+ * This Class handles automatic area resets.
+ * @author lgndluke
+ **/
 public class AutoResetHandler extends AbstractHandler {
 
-    private final MessageHandler messageHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getMessageHandler();
+    private final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler();
     private final DatabaseHandler databaseHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getDatabaseHandler();
-    private List<AutoResetter> autoResetterList = new ArrayList<>();
+    private Map<String, AutoResetter> autoResetterMap = new HashMap<>();
+    private boolean isInitialized = false;
 
     public AutoResetHandler(JavaPlugin plugin) {
         super(plugin);
@@ -36,7 +34,10 @@ public class AutoResetHandler extends AbstractHandler {
     @Override
     public boolean initialize() {
         FutureTask<Boolean> initAutoResetHandler = new FutureTask<>(() -> {
-            //Start auto-resetter for every area.
+            if(!((Boolean) configHandler.get("EnableAutoResets"))) {
+                isInitialized = false;
+                return true;
+            }
             ResultSet areaData = databaseHandler.getAreaData();
             ResultSet areaTimer = null;
             try {
@@ -44,13 +45,14 @@ public class AutoResetHandler extends AbstractHandler {
                     while (areaData.next()) {
                         areaTimer = databaseHandler.getAreaTimer(UUID.fromString(areaData.getString("uuid")));
                         addNewAutoResetter(areaData.getString("areaName"),
-                                areaTimer.getLong("timerValue"));
+                                           areaTimer.getLong("timerValue"));
                     }
                     areaData.close();
                 }
                 if(areaTimer != null) {
                     areaTimer.close();
                 }
+                isInitialized = true;
             } catch(NumberFormatException nfe) {
                 super.getPlugin().getLogger().log(Level.SEVERE, "Failed to enable auto-resetter", nfe);
                 return false;
@@ -65,47 +67,33 @@ public class AutoResetHandler extends AbstractHandler {
 
     @Override
     public boolean terminate() {
-        if(!super.getDefaultAsyncExecutor().isShutdown()) {
-            super.getDefaultAsyncExecutor().shutdown();
-            return true;
-        }
-        return false;
+        super.getDefaultAsyncExecutor().shutdown();
+        super.getScheduledAsyncExecutor().shutdown();
+        return true;
     }
 
     public void addNewAutoResetter(String areaName, long resetInterval) {
-        autoResetterList.add(new AutoResetter(super.getPlugin(), areaName, resetInterval*20));
+        autoResetterMap.put(areaName, new AutoResetter(super.getPlugin(), areaName, resetInterval*20));
     }
 
     public void updateAreaResetInterval(String areaName, long resetInterval) {
-        for(AutoResetter autoResetter : autoResetterList) {
-            if(autoResetter.getAreaName().equals(areaName)) {
-                autoResetter.setResetInterval(resetInterval*20);
-            }
-        }
+        autoResetterMap.get(areaName).setResetInterval(resetInterval*20);
     }
 
     public void removeAreaResetter(String areaName) {
-        for(AutoResetter autoResetter : autoResetterList) {
-            if(autoResetter.getAreaName().equals(areaName)) {
-                autoResetter = null;
-                autoResetterList.remove(autoResetter);
-            }
-        }
+        autoResetterMap.remove(areaName);
     }
 
     public long getTimeRemaining(String areaName) {
-        for(AutoResetter autoResetter : autoResetterList) {
-            if(autoResetter.getAreaName().equals(areaName)) {
-                return autoResetter.timeRemaining;
-            }
-        }
-        return -1;
+        return autoResetterMap.get(areaName).timeRemaining;
+    }
+
+    public boolean isInitialized() {
+        return isInitialized;
     }
 
     private class AutoResetter {
 
-        private final Component prefix = messageHandler.getMessageAsComponent("Prefix");
-        private final Component resetMsgPlayer = messageHandler.getMessageAsComponent("ResetMessagePlayer");
         private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         private final Plugin plugin;
         private final String areaName;
@@ -122,93 +110,21 @@ public class AutoResetHandler extends AbstractHandler {
         }
 
         private FutureTask<Boolean> execute() {
-            return new FutureTask<Boolean>(() -> {
-                try {
-                    ResultSet results = databaseHandler.getAreaData();
-                    while(results.next()) {
-                        if(results.getString("areaName").equals(areaName)) {
-                            UUID uuid = UUID.fromString(results.getString("uuid"));
-                            String worldName = results.getString("world");
-
-                            int[] pos1 = new int[] { results.getInt("xValPos1"),
-                                                     results.getInt("yValPos1"),
-                                                     results.getInt("zValPos1")};
-
-                            int[] pos2 = new int[] { results.getInt("xValPos2"),
-                                                     results.getInt("yValPos2"),
-                                                     results.getInt("zValPos2")};
-
-                            int[] spawn = new int[] { results.getInt("xValSpawn"),
-                                                      results.getInt("yValSpawn"),
-                                                      results.getInt("zValSpawn")};
-
-                            ResultSet areaStats = databaseHandler.getAreaStats(uuid);
-                            int timesReset = areaStats.getInt("timesReset");
-                            areaStats.close();
-
-                            String filePath = "AreaData/" + uuid + ".schem";
-                            File worldData = new File(plugin.getDataFolder().getAbsolutePath(), filePath);
-
-                            if(pos1[0] != spawn[0] && pos1[1] != spawn[1] && pos1[2] != spawn[2]) {
-                                Bukkit.getScheduler().runTask(plugin, () -> {
-                                    List<Player> activePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
-                                    for (Player player : activePlayers) {
-                                        if (isInsideArea(player, new Location(WorldCreator.name(worldName).createWorld(), pos1[0], pos1[1], pos1[2]),
-                                                new Location(WorldCreator.name(worldName).createWorld(), pos2[0], pos2[1], pos2[2]))) {
-                                            player.sendMessage(prefix.append(resetMsgPlayer));
-                                            player.teleportAsync(new Location(WorldCreator.name(worldName).createWorld(), spawn[0], spawn[1], spawn[2]));
-                                        }
-                                    }
-                                });
-                            }
-                            FaweAPI.load(worldData).paste(FaweAPI.getWorld(worldName), BlockVector3.at(Math.min(pos1[0], pos2[0]), Math.min(pos1[1], pos2[1]), Math.min(pos1[2], pos2[2])));
-                            databaseHandler.updateAreaStatsTimesReset(uuid, timesReset);
-
-                            plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, execute(), resetInterval);
-                            this.timeRemaining = this.resetInterval/20;
-                            AreaResetterPro.getPlugin(AreaResetterPro.class).getAreaResetterProExpansion().updateValues();
-                        }
-                    }
-                    results.close();
-                } catch (SQLException se) {
-                    plugin.getLogger().log(Level.SEVERE, "AutoResetter: Couldn't fetch AreaData!", se);
-                } catch (IOException io) {
-                    plugin.getLogger().log(Level.SEVERE, "AutoResetter: Could not reset area: " + areaName);
-                    plugin.getLogger().log(Level.SEVERE, "AutoResetter: An error occurred whilst trying to reset the area.", io);
-                }
+            return new FutureTask<>(() -> {
+                plugin.getServer().getScheduler().runTask(plugin, new ResetTask(null, areaName).execute());
+                plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, execute(), resetInterval);
+                timeRemaining = resetInterval/20;
+                AreaResetterPro.getPlugin(AreaResetterPro.class).getAreaResetterProExpansion().updateValues();
                 return true;
             });
         }
 
-        private boolean isInsideArea(Player player, Location pos1, Location pos2) {
-
-            double xValPlayer = player.getLocation().getBlockX();
-            double yValPlayer = player.getLocation().getBlockY();
-            double zValPlayer = player.getLocation().getBlockZ();
-
-            int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
-            int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
-            int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
-            int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
-            int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
-            int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
-
-            return ((xValPlayer >= minX && xValPlayer <= maxX) &&
-                    (yValPlayer >= minY && yValPlayer <= maxY) &&
-                    (zValPlayer >= minZ && zValPlayer <= maxZ));
-
-        }
-
         private void countDown() {
             scheduler.scheduleAtFixedRate(() -> {
-                if(this.timeRemaining > 0) {
-                    this.timeRemaining--;
+                if(timeRemaining > 0) {
+                    timeRemaining--;
                 }
             }, 0, 1, TimeUnit.SECONDS);
-        }
-
-        private String getAreaName() {
-            return this.areaName;
         }
 
         private void setResetInterval(long resetInterval) {

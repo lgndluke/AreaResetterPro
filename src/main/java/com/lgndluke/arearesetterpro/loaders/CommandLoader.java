@@ -5,7 +5,7 @@ import com.lgndluke.lgndware.loaders.AbstractCommandLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * Static Class used to register Plugin commands during server startup.
+ * This Class is used to register Plugin commands during server startup.
  * @author lgndluke
  **/
 public class CommandLoader extends AbstractCommandLoader {
@@ -17,16 +17,16 @@ public class CommandLoader extends AbstractCommandLoader {
     @Override
     public void load() {
 
-        super.getPlugin().getCommand("arp_reload").setExecutor(new Reload());
-        super.getPlugin().getCommand("arp_tool").setExecutor(new Tool());
-        super.getPlugin().getCommand("arp_getpos").setExecutor(new GetPos());
-        super.getPlugin().getCommand("arp_setspawnpoint").setExecutor(new SetSpawnPoint());
-        super.getPlugin().getCommand("arp_getspawnpoint").setExecutor(new GetSpawnPoint());
-        super.getPlugin().getCommand("arp_create").setExecutor(new Create());
-        super.getPlugin().getCommand("arp_remove").setExecutor(new Remove());
-        super.getPlugin().getCommand("arp_reset").setExecutor(new Reset());
-        super.getPlugin().getCommand("arp_menu").setExecutor(new Menu());
-        super.getPlugin().getCommand("arp_help").setExecutor(new Help());
+        super.getPlugin().getCommand("arp_reload").setExecutor(new ReloadCmd());
+        super.getPlugin().getCommand("arp_tool").setExecutor(new ToolCmd());
+        super.getPlugin().getCommand("arp_getpos").setExecutor(new GetPosCmd());
+        super.getPlugin().getCommand("arp_setspawnpoint").setExecutor(new SetSpawnPointCmd());
+        super.getPlugin().getCommand("arp_getspawnpoint").setExecutor(new GetSpawnPointCmd());
+        super.getPlugin().getCommand("arp_create").setExecutor(new CreateCmd());
+        super.getPlugin().getCommand("arp_remove").setExecutor(new RemoveCmd());
+        super.getPlugin().getCommand("arp_reset").setExecutor(new ResetCmd());
+        super.getPlugin().getCommand("arp_menu").setExecutor(new MenuCmd());
+        super.getPlugin().getCommand("arp_help").setExecutor(new HelpCmd());
 
     }
 

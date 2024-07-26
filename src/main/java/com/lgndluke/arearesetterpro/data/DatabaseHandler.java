@@ -13,7 +13,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -113,6 +115,42 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
         super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaDataTask, 10, TimeUnit.SECONDS);
     }
 
+    public List<String> getAreaDataNames() {
+        FutureTask<List<String>> getAreaDataNamesTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("SELECT areaName AS name FROM AreaData;");
+                ResultSet queryResults = prepState.executeQuery();
+                List<String> results = new ArrayList<>();
+                while(queryResults.next()) {
+                    results.add(queryResults.getString("name"));
+                }
+                return results;
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                return null;
+            }
+        });
+        return super.getDefaultAsyncExecutor().fetchExecutionResultAsList(super.getPlugin().getLogger(), getAreaDataNamesTask, 10, TimeUnit.SECONDS);
+    }
+
+    public int getAreaDataSize() {
+        FutureTask<ResultSet> getAreaDataSizeTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("SELECT COUNT(*) AS amount FROM AreaData;");
+                return prepState.executeQuery();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+                return null;
+            }
+        });
+        try {
+            return super.getDefaultAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaDataSizeTask, 10, TimeUnit.SECONDS).getInt("amount");
+        } catch (SQLException se) {
+            super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaData!", se);
+            return 0;
+        }
+    }
+
     public ResultSet getAreaStats(UUID uuid) {
         FutureTask<ResultSet> getAreaStatsTask = new FutureTask<>(() -> {
             try {
@@ -128,7 +166,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
     }
 
     public void insertAreaStats(UUID uuid, long overallBlocks) {
-        final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler(); //TODO FIX!
+        final ConfigHandler configHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getConfigHandler();
         FutureTask<Boolean> insertAreaStatsTask = new FutureTask<>(() -> {
             try {
                 PreparedStatement prepState = super.getDbCon().prepareStatement("INSERT INTO AreaStats (uuid, timesReset, overallBlocks, entitiesSaved, createdOn) VALUES (?, 0, ?, ?, ?);");
@@ -175,6 +213,24 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             return true;
         });
         super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaStatsTask, 10, TimeUnit.SECONDS);
+    }
+
+    public int getAreaStatsSize() {
+        FutureTask<ResultSet> getAreaStatsSizeTask= new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("SELECT COUNT(*) AS amount FROM AreaStats;");
+                return prepState.executeQuery();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaStats!", se);
+                return null;
+            }
+        });
+        try {
+            return super.getDefaultAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaStatsSizeTask, 10, TimeUnit.SECONDS).getInt("amount");
+        } catch (SQLException se) {
+            super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaStats!", se);
+            return 0;
+        }
     }
 
     public ResultSet getAreaTimer(UUID uuid) {
@@ -236,6 +292,24 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             return true;
         });
         super.getDefaultAsyncExecutor().executeFuture(super.getPlugin().getLogger(), deleteAreaStatsTask, 10, TimeUnit.SECONDS);
+    }
+
+    public int getAreaTimerSize() {
+        FutureTask<ResultSet> getAreaTimerSizeTask = new FutureTask<>(() -> {
+            try {
+                PreparedStatement prepState = super.getDbCon().prepareStatement("SELECT COUNT(*) AS amount FROM AreaTimer;");
+                return prepState.executeQuery();
+            } catch (SQLException se) {
+                super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaTimer!", se);
+                return null;
+            }
+        });
+        try {
+            return super.getDefaultAsyncExecutor().fetchExecutionResult(getPlugin().getLogger(), getAreaTimerSizeTask, 10, TimeUnit.SECONDS).getInt("amount");
+        } catch (SQLException se) {
+            super.getPlugin().getLogger().log(Level.SEVERE, "Couldn't fetch AreaTimer!", se);
+            return 0;
+        }
     }
 
     @Override
