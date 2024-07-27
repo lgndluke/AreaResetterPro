@@ -6,23 +6,26 @@ Author: 'lgndluke'
 
 #--------------------------------------------------------------------------------------------
 #Decide, whether the Plugin should save Entities on Area creation, or not.
-SaveEntities: true
+#Changes can be applied by using the '/arp_reload' command -> AS OF NOW EXPERIMENTAL FEATURE!
+SaveEntities: false
 #--------------------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------------------
 #This section contains timer and auto-reset options.
 
+#Decide, whether the Plugin should automatically reset Area objects in customizable intervalls or not.
+#Changing this value only takes affect after restarting your server!
+EnableAutoResets: true
+
 #All values in this section are calculated in seconds if not stated otherwise!
 #Value of 60 = 1 Minute, 600 = 10 Minutes, 3600 = 1 hour and so on.
-
-#Decide, whether the Plugin should automatically reset Area objects in customizable intervalls or not.
-EnableAutoResets: true
 
 #Specify the default time between reset for every new created Area object.
 #By default, every Area object is reset once an hour.
 DefaultTimerValue: 600
 
 #Determine, by how much increases or decreases from the GUI should affect the reset timer.
+#Remember to also change the values inside the message.yml file accordingly!
 SmallIncreaseValue: 30
 MediumIncreaseValue: 300
 LargeIncreaseValue: 600

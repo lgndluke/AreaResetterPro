@@ -1,88 +1,25 @@
 package com.lgndluke.arearesetterpro.data;
 
-import com.lgndluke.arearesetterpro.AreaResetterPro;
-import org.bukkit.Bukkit;
+import com.lgndluke.lgndware.data.AbstractFileHandler;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * This Class represents the 'SpawnPoint.yml' file.
  * @author lgndluke
  **/
-public class SpawnPointHandler {
+public class SpawnPointHandler extends AbstractFileHandler {
 
-    //Static Attributes
-    private static final Plugin areaPlugin = AreaResetterPro.getPlugin(AreaResetterPro.class);
-    private static File spawnPointFile;
-    private static FileConfiguration spawnPointFileConf;
-
-    //Static Methods
-
-    /**
-     * Initializes the PositionsHandler on server startup.
-     **/
-    public static void initialize() {
-
-        if(!areaPlugin.getDataFolder().exists()) {
-            boolean folderCreated = areaPlugin.getDataFolder().mkdir();
-            if(folderCreated) {
-                areaPlugin.getLogger().log(Level.INFO, "Successfully created 'AreaResetterPro' folder inside plugins folder.");
-            }
-        }
-
-        spawnPointFile = new File(areaPlugin.getDataFolder().getAbsolutePath(), "SpawnPoint.yml");
-
-        if(!spawnPointFile.exists()) {
-            try {
-                boolean fileCreated = spawnPointFile.createNewFile();
-                if(fileCreated) {
-                    areaPlugin.getLogger().log(Level.INFO, "Successfully created 'SpawnPoint.yml' file.");
-                }
-            } catch (IOException e) {
-                areaPlugin.getLogger().log(Level.SEVERE, "Could not create 'SpawnPoint.yml' file!", e);
-                return;
-            }
-        }
-
-        spawnPointFileConf = YamlConfiguration.loadConfiguration(spawnPointFile);
-        spawnPointFileConf.options().copyDefaults(true);
-        save();
-
-    }
-
-    /**
-     * Reloads the 'SpawnPoint.yml' file.
-     * @throws IOException if 'SpawnPoint.yml' doesn't exist or can't be accessed.
-     **/
-    public static void reload() throws IOException {
-        spawnPointFileConf = YamlConfiguration.loadConfiguration(spawnPointFile);
-        spawnPointFileConf.options().copyDefaults(true);
-        save();
-    }
-
-    /**
-     * Saves the 'SpawnPoint.yml' file.
-     **/
-    public static void save() {
-        try {
-            spawnPointFileConf.save(spawnPointFile);
-        } catch (IOException e) {
-            Bukkit.getLogger().log(Level.SEVERE, "Couldn't save data to 'SpawnPoint.yml'", e);
-        }
+    public SpawnPointHandler(JavaPlugin plugin, String fileName) {
+        super(plugin, fileName);
     }
 
     /**
      * Reads the Location inside the 'SpawnPoint.yml' file.
      * @return requested Location value.
      **/
-    public static Location getSpawnPoint(SpawnPoint spawnPoint) {
-        return spawnPointFileConf.getLocation(spawnPoint.toString());
+    public Location getSpawnPoint(SpawnPoint spawnPoint) {
+        return super.getFileConfig().getLocation(spawnPoint.toString());
     }
 
     /**
@@ -90,8 +27,8 @@ public class SpawnPointHandler {
      * @param spawnPoint value of the 'SpawnPoint' enum.
      * @param location represents the to be stored Position.
      **/
-    public static void setSpawnPoint(SpawnPoint spawnPoint, Location location) {
-        spawnPointFileConf.set(spawnPoint.toString(), location);
+    public void setSpawnPoint(SpawnPoint spawnPoint, Location location) {
+        super.getFileConfig().set(spawnPoint.toString(), location);
         save();
     }
 

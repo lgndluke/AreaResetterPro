@@ -37,6 +37,17 @@ ReloadConfigsFailedMessage: '<red>Reloading configuration files failed!</red>'
 #--------------------------------------------------------------------------------------------
 #This section contains messages the sender will receive upon using the position command.
 
+#Name of the AreaResetterPro Tool.
+SetPosToolName: '<light_purple>PosTool</light_purple>'
+
+#Lore of the AreaResetterPro Tool.
+SetPosToolLore:
+  - '<blue>Area</blue><gold>Resetter</gold><red>Pro</red>'
+  - '<grey>--------------------------------------</grey>'
+  - '<gold>Left-Click to set Position 1.</gold>'
+  - '<gold>Right-Click to set Position 2.</gold>'
+  - '<grey>--------------------------------------</grey>'
+
 #Set position 1 ⇛ Used on left-clicks with the SetPosTool.
 SetPos1Message: '<green>Successfully set position 1</green>'
 
@@ -54,14 +65,14 @@ Pos2NotSet: '<red>Position 2 has not been set!</red>'
 #--------------------------------------------------------------------------------------------
 #This section contains messages the sender will receive upon using the spawnpoint command.
 
-#Set spawnpoint ⇛ Used on middle-clicks with the SetPosTool.
+#No SpawnPoint is set inside SpawnPoint.yml
+SpawnPointNotSet: '<red>No Spawnpoint has been set.</red>'
+
+#The 'arp_setspawnpoint' command has succeeded in writing the Position to the SpawnPoint.yml file.
 SetSpawnPointMessage: '<green>Successfully set spawnpoint</green>'
 
 #Used when saving process of a position fails.
 SetSpawnPointFailed: '<red>Could not save current spawnpoint. Check console for more information.</red>'
-
-#Command 'arp_getSpawnPoint'
-SpawnPointNotSet: '<red>Spawnpoint has not been set!</red>'
 #--------------------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------------------
@@ -213,6 +224,9 @@ TeleportItemLore:
   - '<grey>--------------------------------------</grey>'
   - '<gold>Left-Click to teleport to this Area.</gold>'
   - '<grey>--------------------------------------</grey>'
+
+#Message that is sent, when the teleportation should fail.
+TeleportationFailed: '<red>Teleportation failed. Please check your console log!</red>'
 
 #Name of the item, which is used to display an Areas stats.
 StatsItemName: '<gold>Statistics</gold>'
