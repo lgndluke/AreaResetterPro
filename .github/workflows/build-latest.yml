@@ -68,8 +68,8 @@ jobs:
           cd lgndware-lgndware-1.0.0-PAPER
           mvn install:install-file -Dfile=lgndware-1.0.0-PAPER-1.20.jar -DgroupId=com.lgndluke -DartifactId=lgndware -Dversion=1.0.0-PAPER-1.20 -Dpackaging=jar -DpomFile=pom-1-20.xml
           cd ..
-          mvn install
-          mvn -B package --file pom-1-20.xml
+          mvn install -f pom-1-20.xml
+          mvn -B package -f pom-1-20.xml
 
       - name: Create release directory and move AreaResetterPro-1.3.4-PAPER-1.20.jar into it.
         run: |
@@ -89,8 +89,8 @@ jobs:
           cd lgndware-lgndware-1.0.0-PAPER
           mvn install:install-file -Dfile=lgndware-1.0.0-PAPER-1.21.jar -DgroupId=com.lgndluke -DartifactId=lgndware -Dversion=1.0.0-PAPER-1.21 -Dpackaging=jar -DpomFile=pom-1-21.xml
           cd ..
-          mvn install
-          mvn -B package --file pom-1-21.xml
+          mvn install -f pom-1-21.xml
+          mvn -B package -f pom-1-21.xml
 
       - name: Move AreaResetterPro-1.3.4-PAPER-1.21.jar into release directory.
         run: mv target/*-1.21.jar release/
@@ -143,6 +143,26 @@ jobs:
           prerelease: false
 
       - name: Upload 1.20 .jar to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.JAR_PATH }}
+          asset_name: ${{ env.JAR_NAME }}
+          asset_content_type: application/java-archive
+
+      - name: Get 1.21.jar file name
+        id: get_jar_name_1_21
+        run: |
+          JAR_PATH=$(ls release/AreaResetterPro-1.3.4-PAPER-1.21.jar)
+          JAR_NAME=$(basename $JAR_PATH)
+          JAR_BASENAME=${JAR_NAME%.jar}
+          echo "JAR_PATH=${JAR_PATH}" >> $GITHUB_ENV
+          echo "JAR_NAME=${JAR_NAME}" >> $GITHUB_ENV
+          echo "JAR_BASENAME=${JAR_BASENAME}" >> $GITHUB_ENV
+
+      - name: Upload 1.21 .jar to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
