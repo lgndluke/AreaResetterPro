@@ -19,12 +19,13 @@ public class SetPosToolListener extends ToolCmd implements Listener {
 
     @EventHandler
     public void onToolClick(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        if(!player.hasPermission("arearesetterpro.tool")) {
-            player.sendMessage(prefix.append(noPermission));
-            return;
-        }
         if(event.hasItem() && event.getItem().getItemMeta().getPersistentDataContainer().has(tool.getPosToolKey())) {
+            Player player = event.getPlayer();
+            if(!player.hasPermission("arearesetterpro.tool")) {
+                player.sendMessage(prefix.append(noPermission));
+                event.setCancelled(true);
+                return;
+            }
             if(event.getClickedBlock() != null) {
                 Location location = event.getClickedBlock().getLocation();
                 if(event.getAction().isLeftClick()) {
@@ -37,7 +38,6 @@ public class SetPosToolListener extends ToolCmd implements Listener {
                 }
             }
         }
-
     }
 
     private void execute(Player player, PositionsHandler.Position position, Location location) {
