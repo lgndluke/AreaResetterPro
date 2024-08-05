@@ -111,7 +111,7 @@ public class AutoResetHandler extends AbstractHandler {
 
         private FutureTask<Boolean> execute() {
             return new FutureTask<>(() -> {
-                plugin.getServer().getScheduler().runTask(plugin, new ResetTask(null, areaName).execute());
+                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new ResetTask(null, areaName).execute());
                 plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, execute(), resetInterval);
                 timeRemaining = resetInterval/20;
                 AreaResetterPro.getPlugin(AreaResetterPro.class).getAreaResetterProExpansion().updateValues();
