@@ -27,31 +27,23 @@
 
 ---
 
-![GIF of example area reset](https://i.imgur.com/AYsA4yo.gif)
+<img src="https://i.imgur.com/AYsA4yo.gif" alt="GIF of example area reset"/>
 
 ---
 
 ## 🚀 Getting Started:
 
----
-
 Find the Installation Guide here: [Installation Guide](https://arearesetterpro.lgndluke.com/01-getting-started/03-installation/).
 
 ## ⭐ Further Information:
-
----
 
 For further information check out the full documentation here: [Documentation](https://arearesetterpro.lgndluke.com)
 
 ## 💡 Find help:
 
----
-
 Join the [Discord Server](https://discord.gg/PvBEzN2QmK) for support regarding AreaResetterPro.
 
 ## 🔧 Contribute:
-
----
 
 #### Contributions are very welcome!
 
@@ -69,13 +61,9 @@ The versioning syntax for AreaResetterPro consists of **three parts:**
 
 ##  🧾 License:
 
----
-
 This project is licensed under the MIT License.
 
 ## 💙 Donate:
-
----
 
 <div align=center> 
     <a href='https://www.paypal.com/paypalme/lgndluke' target='_blank'><img height='50' src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png' alt='Support Me via PayPal'/></a>
