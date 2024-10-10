@@ -23,10 +23,9 @@
   </a>
 </p>
 
----
 ## 🔁 Example Reset:
 
-<img src="https://i.imgur.com/AYsA4yo.gif" alt="GIF of example area reset">
+![GIF of example area reset](https://i.imgur.com/AYsA4yo.gif)
 
 ## 🚀 Getting Started:
 
