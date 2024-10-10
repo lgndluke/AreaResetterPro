@@ -6,8 +6,6 @@
   <br>
 </h1>
 
----
-
 <h4 align="center">A Minecraft Plugin enabling you to create, manage and reset areas of your Minecraft Server.</h4>
 
 <p align="center">
@@ -26,10 +24,9 @@
 </p>
 
 ---
+## 🔁 Example Reset:
 
-<img src="https://i.imgur.com/AYsA4yo.gif" alt="GIF of example area reset"/>
-
----
+<img src="https://i.imgur.com/AYsA4yo.gif" alt="GIF of example area reset">
 
 ## 🚀 Getting Started:
 
@@ -53,7 +50,7 @@ Find a detailed guide on how to contribute here: [Contributing Guide](https://ar
 
 The versioning syntax for AreaResetterPro consists of **three parts:**
 
-#### Example: ```1.4.0.27-PAPER-1.21```
+**Example:** ```1.4.0.27-PAPER-1.21```
 
 1. ```1.4.0.27``` (MAJOR.MINOR.PATCH.BUILD)
 2. ```PAPER```    (CORRESPONDING SERVER FORK)
