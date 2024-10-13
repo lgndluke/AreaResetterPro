@@ -25,7 +25,7 @@
 
 ## 🔁 Example Reset:
 
-![GIF of example area reset](https://i.imgur.com/AYsA4yo.gif)
+<a href="https://github.com/lgndluke/AreaResetterPro/"><img src="https://i.imgur.com/AYsA4yo.gif" alt="AreaResetterPro Banner" width="1080"></a>
 
 ## 🚀 Getting Started:
 
