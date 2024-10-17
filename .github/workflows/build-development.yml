@@ -1,9 +1,9 @@
 name: build-latest
 
-on:
-  push:
-    branches:
-      - development
+#on:
+  #push:
+  #  branches:
+  #    - development
 
 jobs:
   analyze:
@@ -71,7 +71,7 @@ jobs:
           mvn install -f pom-1-20.xml
           mvn -B package -f pom-1-20.xml
 
-      - name: Create release directory and move AreaResetterPro-1.3.4-PAPER-1.20.jar into it.
+      - name: Create release directory and move AreaResetterPro-1.4.0-PAPER-1.20.jar into it.
         run: |
           mkdir -p release
           mv target/*-1.20.jar release/
@@ -79,7 +79,7 @@ jobs:
       - name: Upload 1.20.jar as an artifact.
         uses: actions/upload-artifact@v4
         with:
-          name: AreaResetterPro-1.3.4-PAPER-1.20
+          name: AreaResetterPro-1.4.0-PAPER-1.20
           path: release/*.jar
 
       - name: Download, install dependencies and build project for 1.21.
@@ -92,13 +92,13 @@ jobs:
           mvn install -f pom-1-21.xml
           mvn -B package -f pom-1-21.xml
 
-      - name: Move AreaResetterPro-1.3.4-PAPER-1.21.jar into release directory.
+      - name: Move AreaResetterPro-1.4.0-PAPER-1.21.jar into release directory.
         run: mv target/*-1.21.jar release/
 
       - name: Upload .jar file as an artifact.
         uses: actions/upload-artifact@v4
         with:
-          name: AreaResetterPro-1.3.4-PAPER-1.21
+          name: AreaResetterPro-1.4.0-PAPER-1.21
           path: release/*.jar
 
   deploy:
@@ -112,13 +112,13 @@ jobs:
       - name: Download 1.20.jar artifact.
         uses: actions/download-artifact@v4
         with:
-          name: AreaResetterPro-1.3.4-PAPER-1.20
+          name: AreaResetterPro-1.4.0-PAPER-1.20
           path: release
 
       - name: Download 1.21.jar artifact.
         uses: actions/download-artifact@v4
         with:
-          name: AreaResetterPro-1.3.4-PAPER-1.21
+          name: AreaResetterPro-1.4.0-PAPER-1.21
           path: release
 
       - name: Get 1.20 .jar file name
