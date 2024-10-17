@@ -25,7 +25,7 @@
 
 ## 🔁 Example Reset:
 
-![GIF of example area reset](assets/AYsA4yo.mp4)
+[![GIF of example area reset]()](https://github.com/user-attachments/assets/ed28c1f5-38c3-453a-9957-96fe0ba9cca8)
 
 ## 🚀 Getting Started:
 
