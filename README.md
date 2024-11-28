@@ -1,105 +1,66 @@
-
 <h1 align="center">
-  <p>AreaResetterPro</p>
-  <img width=20% src="https://i.imgur.com/vVXzVAR.png" alt="AreaResetterPro Banner">
+  <br>
+  <a href="https://github.com/lgndluke/AreaResetterPro/"><img src="https://i.imgur.com/vVXzVAR.png" alt="AreaResetterPro Banner" width="200"></a>
+  <br>
+  AreaResetterPro
+  <br>
 </h1>
 
-<h4 align="center">A light-weight Minecraft Plugin for the PaperMC server fork.</h4>
-<hr>
+<h4 align="center">A Minecraft Plugin enabling you to create, manage and reset areas of your Minecraft Server.</h4>
 
 <p align="center">
-  <a href="#about">About</a>
-  •
-  <a href="#features">Features</a>
-  •
-  <a href="#dependencies">Dependencies</a>
-  •
-  <a href="#installation-guide">Installation Guide</a>
-  •
-  <a href="#permissions">Permissions</a>
-  •
-  <a href="#commands">Commands</a>
-  •
-  <a href="#support">Support</a>
-  •
-  <a href="#contributions">Contributions</a>
-  •
-  <a href="#license">License</a>
+  <a href="https://github.com/lgndluke/AreaResetterPro/releases/latest">
+    <img src="https://img.shields.io/github/v/release/lgndluke/AreaResetterPro?include_prereleases&display_name=release&style=flat&label=Release%3A"
+         alt="Current Release">
+  </a>
+  <a href="https://www.spigotmc.org/resources/update-open-source-arearesetterpro-reset-areas-with-ease.109372/">
+    <img src="https://img.shields.io/spiget/downloads/109372?label=Downloads%3A"
+         alt="Downloads">
+  </a>
+  <a href="https://github.com/lgndluke/AreaResetterPro/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/lgndluke/AreaResetterPro/build-latest.yml?branch=master&style=flat&label=Build%20status%3A"
+         alt="Build Status">
+  </a>
 </p>
 
----
+## 🔁 Example Reset:
 
-> [!Note]
->
-> #### ***AreaResetterPro requires FastAsyncWorldEdit to operate!***
+[![GIF of example area reset]()](https://github.com/user-attachments/assets/ed28c1f5-38c3-453a-9957-96fe0ba9cca8)
 
-## About
+## 🚀 Getting Started:
 
-AreaResetterPro is a versatile Minecraft plugin, which enables you to create, manage and reset predefined areas of your Minecraft server. It's built to support multiple worlds and offers a in-game GUI for easy administration.
+Find the Installation Guide here: [Installation Guide](https://arearesetterpro.lgndluke.com/01-getting-started/03-installation/).
 
-## Features
+## ⭐ Further Information:
 
-- **Efficient Area Resets**: Reseting an Area is done asynchronously, so your servers main-thread can focus on handling other important tasks!
-- **Simplicity**: The Plugin is designed to work straight out of the box.
-- **Scheduled Resets**: AreaResetterPro allows for automated resets. This feature can be disabled in the 'config.yml' file.
-- **Multi-World Support**: Operating across different worlds of your server is no problem.
-- **Customization**: The Plugin allows for customization of nearly every message you will ever receive.
+For further information check out the full documentation here: [Documentation](https://arearesetterpro.lgndluke.com)
 
-## Dependencies
+## 💡 Find help:
 
-- `FastAsyncWorldEdit`: Make sure to have the latest version of FastAsyncWorldEdit installed on your Minecraft server. Otherwise AreaResetterPro will not be able to function!
-- `PlaceholderAPI`: Not required! Allows to use placeholders to show how much time until an area is reset the next time. Usage: %arearesetterpro_[areaName]%
+Join the [Discord Server](https://discord.gg/PvBEzN2QmK) for support regarding AreaResetterPro.
 
-## Installation Guide
+## 🔧 Contribute:
 
-1. Download AreaResetterPro from [SpigotMC](https://www.spigotmc.org/resources/arearesetterpro.109372/).
-2. Place the downloaded file in your server's `plugins` folder.
-3. Restart your server to load the plugin.
+#### Contributions are very welcome!
 
-## Permissions
+Find a detailed guide on how to contribute here: [Contributing Guide - Work in Progress](https://arearesetterpro.lgndluke.com)
 
-- `arearesetterpro.reload`: Allows players to reload the plugins configuration files.
-- `arearesetterpro.tool`: Allows players to obtain and use the AreaReseterPro Tool.
-- `arearesetterpro.getpos`: Allows players to receive the currently set positions.
-- `arearesetterpro.setspawnpoint`: Allows players to set the spawn-point.
-- `arearesetterpro.getspawnpoint`: Allows players to receive the currently set spawn-point.
-- `arearesetterpro.create`: Allows players to create an new area object.
-- `arearesetterpro.remove`: Allows players to remove an area object.
-- `arearesetterpro.reset`: Allows players to reset an area.
-- `arearesetterpro.menu`: Allows players to use the plugins menu.
-- `arearesetterpro.help`: Allows players to used the help command.
+#### Versioning Syntax:
 
-## Commands
+The versioning syntax for AreaResetterPro consists of **three parts:**
 
-- `/arp_reload`: Reloads the configuration files.
-- `/arp_tool`: Provides the caller with the AreaResetterPro Tool.
-- `/arp_getpos`: Provides the player with the currently set positions.
-- `/arp_setspawnpoint`: Will set the spawn-point to the players location.
-- `/arp_getspawnpoint`: Provides the player with the currently set spawn-point.
-- `/arp_create [AreaName]`: Will create a new area object with the corresponding name.
-- `/arp_remove [AreaName]`: Will delete the corresponding area object, if it exists.
-- `/arp_reset [AreaName]`: Will reset the corresponding area object, if it exists.
-- `/arp_menu`: Opens the plugins GUI.
-- `/arp_help`: Provides players with a simple help text.
+**Example:** ```1.4.0.27-PAPER-1.21```
 
-## Support
+1. ```1.4.0.27``` (MAJOR.MINOR.PATCH.BUILD)
+2. ```PAPER```    (CORRESPONDING SERVER FORK)
+3. ```1.21```     (CORRESPONDING MINECRAFT VERSION)
 
-Join my [Discord Server](https://discord.gg/QNz9MdnmGK) for assistance, suggestions, or discussions regarding AreaResetterPro.
+##  🧾 License:
 
-## Contributions
+This project is licensed under the MIT License.
 
-### How to Contribute
-1. Fork and star the repository.
-2. Create a branch for your changes.
-3. Commit and push your changes.
-4. Submit a pull request with a clear description of your improvements.
+## 💙 Donate:
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-<div align="center"> 
-<a href='https://www.paypal.com/paypalme/lgndluke' target='_blank'><img height='50' src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png' alt='Support Me via PayPal'/></a>
+<div align=center> 
+    <a href='https://www.paypal.com/paypalme/lgndluke' target='_blank'><img height='50' src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png' alt='Support Me via PayPal'/></a>
 </div>
