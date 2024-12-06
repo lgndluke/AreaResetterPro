@@ -81,4 +81,4 @@ jobs:
           generate_release_notes: true
           append_body: true
           prerelease: false
-          files: release/
+          files: release/*
