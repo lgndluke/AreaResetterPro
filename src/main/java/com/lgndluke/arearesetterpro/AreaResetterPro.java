@@ -20,7 +20,7 @@ import java.util.List;
 **/
 public final class AreaResetterPro extends JavaPlugin {
 
-    //TODO Before Releasing AreaResetterPro Version 1.4.0
+    //TODO Before Releasing AreaResetterPro Version 1.4.0.
     // -> Add Enable/Disable Resets feature for Areas.
 
     private final List<AbstractHandler> handlerList = new ArrayList<>();
