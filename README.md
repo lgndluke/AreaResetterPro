@@ -31,11 +31,11 @@
 
 Find the Installation Guide here: [Installation Guide](https://www.lgndluke.dev/01-getting-started/03-installation/).
 
-## ⭐ Further Information:
+## ⭐ Documentation:
 
 For further information check out the full documentation here: [Documentation](https://www.lgndluke.dev/)
 
-## 💡 Find help:
+## 💡 Support:
 
 Join the [Discord Server](https://discord.gg/PvBEzN2QmK) for support regarding AreaResetterPro.
 
@@ -55,9 +55,9 @@ The versioning syntax for AreaResetterPro consists of **three parts:**
 2. ```PAPER```    (CORRESPONDING SERVER FORK)
 3. ```1.21```     (CORRESPONDING MINECRAFT VERSION)
 
-##  🧾 License:
+## ⚡ Usage:
 
-This project is licensed under the MIT License.
+![BStats Metrics Usage Statistics](https://proxy.spigotmc.org/38af47a679ae794fd0ee4fdb3e5d0f494d03cfad?url=https%3A%2F%2Fbstats.org%2Fsignatures%2Fbukkit%2FAreaResetterPro.svg)
 
 ## 💙 Donate:
 
