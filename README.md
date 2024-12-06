@@ -10,15 +10,15 @@
 
 <p align="center">
   <a href="https://github.com/lgndluke/AreaResetterPro/releases/latest">
-    <img src="https://img.shields.io/github/v/release/lgndluke/AreaResetterPro?include_prereleases&display_name=release&style=flat&label=Release%3A"
+    <img src="https://img.shields.io/github/v/release/lgndluke/AreaResetterPro?include_prereleases&display_name=release&style=for-the-badge"
          alt="Current Release">
   </a>
   <a href="https://www.spigotmc.org/resources/update-open-source-arearesetterpro-reset-areas-with-ease.109372/">
-    <img src="https://img.shields.io/spiget/downloads/109372?label=Downloads%3A"
+    <img src="https://img.shields.io/spiget/downloads/109372?style=for-the-badge"
          alt="Downloads">
   </a>
   <a href="https://github.com/lgndluke/AreaResetterPro/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/lgndluke/AreaResetterPro/build-latest.yml?branch=master&style=flat&label=Build%20status%3A"
+    <img src="https://img.shields.io/github/actions/workflow/status/lgndluke/AreaResetterPro/build.yml?branch=main&style=for-the-badge&label=Build%20Status%3A"
          alt="Build Status">
   </a>
 </p>
