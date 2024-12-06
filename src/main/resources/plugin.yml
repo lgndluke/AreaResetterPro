@@ -48,6 +48,14 @@ commands:
     description: This command will open the plugins menu.
     usage: "/arp_menu"
     permission: arearesetterpro.gui
+  arp_enable:
+    description: This command enables auto resets for an area.
+    usage: "arp_enable [areaName]"
+    permission: arearesetterpro.enable
+  arp_disable:
+    description: This command disables auto resets for an area.
+    usage: "arp_disable [areaName]"
+    permission: arearesetterpro.disable
 permissions:
   arearesetterpro.help:
     description: Allows players to use the help command.
@@ -78,4 +86,10 @@ permissions:
     default: op
   arearesetterpro.menu:
     description: Allows players to use the plugins gui.
+    default:
+  arearesetterpro.enable:
+    description: Allows players to enable autoresets for an area.
+    default: op
+  arearesetterpro.disable:
+    description: Allows players to disable autoresets for an area.
     default: op
