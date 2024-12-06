@@ -354,6 +354,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
                 "xValSpawn INT NOT NULL, " +
                 "yValSpawn INT NOT NULL, " +
                 "zValSpawn INT NOT NULL, " +
+                "enabled BOOLEAN NOT NULL, " +
                 "PRIMARY KEY (uuid)" +
                 ");";
 
