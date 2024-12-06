@@ -1,18 +1,14 @@
 package com.lgndluke.arearesetterpro.commands;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
+import com.lgndluke.arearesetterpro.tools.SetPosTool;
 import com.lgndluke.lgndware.commands.AbstractCommandExecutor;
 import com.lgndluke.lgndware.data.MessageHandler;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
@@ -44,35 +40,6 @@ public class ToolCmd extends AbstractCommandExecutor implements CommandExecutor 
         }
         ((Player) sender).getInventory().addItem(new SetPosTool().getPosTool());
         return true;
-    }
-
-    /**
-     * Represents the ItemStack object used to set this plugin's positions.
-     * @author lgndluke
-     **/
-    protected class SetPosTool extends ToolCmd {
-
-        private final NamespacedKey setPosToolKey = new NamespacedKey(super.getPlugin(), "AreaResetterPro_PosTool");
-        private final ItemStack setPosTool;
-
-        public SetPosTool() {
-            setPosTool = new ItemStack(Material.IRON_SHOVEL, 1);
-            ItemMeta toolMeta = setPosTool.getItemMeta();
-            toolMeta.displayName(messageHandler.getMessageAsComponent("SetPosToolName"));
-            toolMeta.lore(messageHandler.getMessagesAsComponentList("SetPosToolLore"));
-            toolMeta.setUnbreakable(true);
-            toolMeta.getPersistentDataContainer().set(setPosToolKey, PersistentDataType.STRING, setPosToolKey.value());
-            setPosTool.setItemMeta(toolMeta);
-        }
-
-        private ItemStack getPosTool() {
-            return setPosTool;
-        }
-
-        public NamespacedKey getPosToolKey() {
-            return setPosToolKey;
-        }
-
     }
 
 }
