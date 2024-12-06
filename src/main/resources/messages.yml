@@ -341,5 +341,7 @@ HelpReload: '/arp_reload | Reload the config files.'
 HelpRemove: '/arp_remove [Area] | Remove an Area.'
 HelpReset:  '/arp_reset [Area] | Reset an Area.'
 HelpTool:   '/arp_tool | Obtain the PosTool.'
+HelpEnable: '/arp_enable | Enable AutoResets for an Area.'
+HelpDisable: '/arp_disable | Disable AutoResets for an Area.'
 
 #--------------------------------------------------------------------------------------------

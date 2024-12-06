@@ -44,6 +44,8 @@ public class HelpCmd extends AbstractCommandExecutor implements CommandExecutor 
             super.getPlugin().getLogger().log(Level.INFO, messageHandler.getMessageAsString("HelpRemove"));
             super.getPlugin().getLogger().log(Level.INFO, messageHandler.getMessageAsString("HelpReset"));
             super.getPlugin().getLogger().log(Level.INFO, messageHandler.getMessageAsString("HelpTool"));
+            super.getPlugin().getLogger().log(Level.INFO, messageHandler.getMessageAsString("HelpEnable"));
+            super.getPlugin().getLogger().log(Level.INFO, messageHandler.getMessageAsString("HelpDisable"));
             super.getPlugin().getLogger().log(Level.INFO, "-----------------------------------");
             return true;
         }
@@ -57,6 +59,8 @@ public class HelpCmd extends AbstractCommandExecutor implements CommandExecutor 
         sender.sendMessage(this.prefix.append(messageHandler.getMessageAsComponent("HelpRemove")));
         sender.sendMessage(this.prefix.append(messageHandler.getMessageAsComponent("HelpReset")));
         sender.sendMessage(this.prefix.append(messageHandler.getMessageAsComponent("HelpTool")));
+        sender.sendMessage(this.prefix.append(messageHandler.getMessageAsComponent("HelpEnable")));
+        sender.sendMessage(this.prefix.append(messageHandler.getMessageAsComponent("HelpDisable")));
         sender.sendMessage(this.prefix.append(PlainTextComponentSerializer.plainText().deserialize("-----------------------------------")));
         return true;
     }
