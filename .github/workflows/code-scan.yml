@@ -1,0 +1,42 @@
+name: code-scan
+
+on:
+  push:
+    branches:
+      - main
+      - development-1.4.0
+    paths:
+      - 'src/main/java/**'
+
+jobs:
+  analyze:
+    name: Code-Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - language: java-kotlin
+            build-mode: none
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
