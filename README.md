@@ -29,11 +29,11 @@
 
 ## 🚀 Getting Started:
 
-Find the Installation Guide here: [Installation Guide](https://arearesetterpro.lgndluke.com/01-getting-started/03-installation/).
+Find the Installation Guide here: [Installation Guide](https://www.lgndluke.dev/01-getting-started/03-installation/).
 
 ## ⭐ Further Information:
 
-For further information check out the full documentation here: [Documentation](https://arearesetterpro.lgndluke.com)
+For further information check out the full documentation here: [Documentation](https://www.lgndluke.dev/)
 
 ## 💡 Find help:
 
@@ -43,7 +43,7 @@ Join the [Discord Server](https://discord.gg/PvBEzN2QmK) for support regarding A
 
 #### Contributions are very welcome!
 
-Find a detailed guide on how to contribute here: [Contributing Guide - Work in Progress](https://arearesetterpro.lgndluke.com)
+Find a detailed guide on how to contribute here: [Coming soon!]()
 
 #### Versioning Syntax:
 
