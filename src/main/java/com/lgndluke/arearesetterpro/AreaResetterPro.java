@@ -22,6 +22,8 @@ public final class AreaResetterPro extends JavaPlugin {
 
     //TODO Before Releasing AreaResetterPro Version 1.4.0.
     // -> Add Enable/Disable Resets feature for Areas.
+    // -> Add Area-Visualization when holding the arp_tool in hand.
+    // -> <Optional>: Rework UI to make it more pretty.
 
     private final List<AbstractHandler> handlerList = new ArrayList<>();
     private final List<Boolean> handlerInitList = new ArrayList<>();
