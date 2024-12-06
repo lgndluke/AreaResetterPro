@@ -1,11 +1,6 @@
 name: build
 
 on:
-  push:
-    branches:
-      - development-1.4.0
-    paths:
-      - 'src/main/java/**'
   pull_request:
     branches:
       - main
