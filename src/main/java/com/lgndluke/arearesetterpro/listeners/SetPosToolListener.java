@@ -3,6 +3,7 @@ package com.lgndluke.arearesetterpro.listeners;
 import com.lgndluke.arearesetterpro.commands.ToolCmd;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
 import com.lgndluke.arearesetterpro.tasks.SetPosTask;
+import com.lgndluke.arearesetterpro.tools.SetPosTool;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
