@@ -57,7 +57,7 @@ The versioning syntax for AreaResetterPro consists of **three parts:**
 
 ## ⚡ Usage:
 
-[![BStats Metrics Usage Statistics]()](https://proxy.spigotmc.org/38af47a679ae794fd0ee4fdb3e5d0f494d03cfad?url=https%3A%2F%2Fbstats.org%2Fsignatures%2Fbukkit%2FAreaResetterPro.svg)
+[![BStats Metrics Usage Statistics]()](https://bstats.org/signatures/bukkit/AreaResetterPro.svg)
 
 ## 💙 Donate:
 
