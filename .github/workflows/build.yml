@@ -46,7 +46,7 @@ jobs:
       - name: Generate Version Number
         run: |
           VERSION=$(cat src/main/java/com/lgndluke/arearesetterpro/VERSION.DAT)
-          VERSION="${VERSION}.${GITHUB_RUN_NUMBER}"
+          VERSION="${VERSION}.${GITHUB_RUN_NUMBER}-PAPER-1.21"
           echo "version=$VERSION" >> $GITHUB_ENV
 
       - name: Build Project
