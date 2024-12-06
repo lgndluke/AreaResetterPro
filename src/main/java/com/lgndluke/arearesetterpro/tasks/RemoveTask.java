@@ -3,7 +3,7 @@ package com.lgndluke.arearesetterpro.tasks;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.commands.RemoveCmd;
-import com.lgndluke.arearesetterpro.data.AutoResetHandler;
+import com.lgndluke.arearesetterpro.autoresets.AutoResetHandler;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
 import com.lgndluke.lgndware.data.ConfigHandler;
 import net.kyori.adventure.text.Component;

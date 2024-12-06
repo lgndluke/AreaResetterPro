@@ -1,6 +1,6 @@
 package com.lgndluke.arearesetterpro;
 
-import com.lgndluke.arearesetterpro.data.AutoResetHandler;
+import com.lgndluke.arearesetterpro.autoresets.AutoResetHandler;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
 import com.lgndluke.arearesetterpro.data.SpawnPointHandler;

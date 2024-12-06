@@ -1,6 +1,7 @@
-package com.lgndluke.arearesetterpro.data;
+package com.lgndluke.arearesetterpro.autoresets;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
+import com.lgndluke.arearesetterpro.data.DatabaseHandler;
 import com.lgndluke.arearesetterpro.tasks.ResetTask;
 import com.lgndluke.lgndware.data.AbstractHandler;
 import com.lgndluke.lgndware.data.ConfigHandler;

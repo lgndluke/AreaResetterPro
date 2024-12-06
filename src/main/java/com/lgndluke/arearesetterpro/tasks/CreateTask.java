@@ -3,7 +3,7 @@ package com.lgndluke.arearesetterpro.tasks;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.lgndluke.arearesetterpro.AreaResetterPro;
 import com.lgndluke.arearesetterpro.commands.CreateCmd;
-import com.lgndluke.arearesetterpro.data.AutoResetHandler;
+import com.lgndluke.arearesetterpro.autoresets.AutoResetHandler;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
 import com.lgndluke.arearesetterpro.data.SpawnPointHandler;

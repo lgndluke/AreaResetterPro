@@ -1,7 +1,7 @@
 package com.lgndluke.arearesetterpro.commands;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.data.AutoResetHandler;
+import com.lgndluke.arearesetterpro.autoresets.AutoResetHandler;
 import com.lgndluke.arearesetterpro.data.PositionsHandler;
 import com.lgndluke.arearesetterpro.data.SpawnPointHandler;
 import com.lgndluke.lgndware.commands.AbstractCommandExecutor;

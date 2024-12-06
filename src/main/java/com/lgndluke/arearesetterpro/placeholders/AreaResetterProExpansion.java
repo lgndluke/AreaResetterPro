@@ -1,7 +1,7 @@
 package com.lgndluke.arearesetterpro.placeholders;
 
 import com.lgndluke.arearesetterpro.AreaResetterPro;
-import com.lgndluke.arearesetterpro.data.AutoResetHandler;
+import com.lgndluke.arearesetterpro.autoresets.AutoResetHandler;
 import com.lgndluke.arearesetterpro.data.DatabaseHandler;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
