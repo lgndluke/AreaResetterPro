@@ -35,6 +35,10 @@ import java.util.logging.Level;
 import static com.lgndluke.arearesetterpro.data.PositionsHandler.Position.POS1;
 import static com.lgndluke.arearesetterpro.data.PositionsHandler.Position.POS2;
 
+/**
+ * This process asynchronously executes the 'arp_create' command's logic.
+ * @author lgndluke
+ **/
 public class CreateTask extends CreateCmd {
 
     private final PositionsHandler positionsHandler = AreaResetterPro.getPlugin(AreaResetterPro.class).getPositionsHandler();
