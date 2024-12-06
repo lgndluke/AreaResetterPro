@@ -27,6 +27,8 @@ public class CommandLoader extends AbstractCommandLoader {
         super.getPlugin().getCommand("arp_reset").setExecutor(new ResetCmd());
         super.getPlugin().getCommand("arp_menu").setExecutor(new MenuCmd());
         super.getPlugin().getCommand("arp_help").setExecutor(new HelpCmd());
+        super.getPlugin().getCommand("arp_enable").setExecutor(new EnableCmd());
+        super.getPlugin().getCommand("arp_disable").setExecutor(new DisableCmd());
 
     }
 
