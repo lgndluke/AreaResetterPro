@@ -43,17 +43,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Display contents
-        run: ls -a
-
       - name: Generate Version Number
         run: |
           VERSION=$(cat src/main/java/com/lgndluke/arearesetterpro/VERSION.DAT)
           VERSION="${VERSION}.${GITHUB_RUN_NUMBER}"
           echo "version=$VERSION" >> $GITHUB_ENV
-
-      - name: Display contents
-        run: ls -a
 
       - name: Build Project
         run: |
@@ -61,9 +55,6 @@ jobs:
           mvn -B package -f pom.xml -Drevision=${{ env.version }}
           mkdir -p release
           mv target/AreaResetterPro*.jar release/
-
-      - name: Display contents
-        run: ls -a
 
       - name: Deploy Release
         uses: softprops/action-gh-release@v2
