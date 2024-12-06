@@ -77,7 +77,7 @@ jobs:
         with:
           tag_name: AreaResetterPro-${{ env.version }}
           name: AreaResetterPro-${{ env.version }}
-          target_commitish: main
+          target_commitish: master
           generate_release_notes: true
           append_body: true
           prerelease: false
